@@ -1,7 +1,7 @@
 package com.harris.rf.bbptt.core;
 
-import com.harris.rf.bbptt.core.IBbPttCore;
 import java.util.List;
+
 /* loaded from: classes.dex */
 public class BbPttCore implements IBbPttCore {
     private final long coreHandle = nativeCreateBbPttCore();
