@@ -15,14 +15,28 @@ project("mmdvm")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+add_library(libssl SHARED IMPORTED)
+set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libssl.so)
+add_library(libsecdll SHARED IMPORTED)
+set_target_properties(libsecdll PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libsecdll.so)
+add_library(libmutauth SHARED IMPORTED)
+set_target_properties(libmutauth PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libmutauth.so)
+add_library(libcrypto SHARED IMPORTED)
+set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libcrypto.so)
+add_library(libcpp_shared SHARED IMPORTED)
+set_target_properties(libcpp_shared PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libc++_shared.so)
+add_library(libcore SHARED IMPORTED)
+set_target_properties(libcore PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/liblib-core.so)
+
+
 add_library( # Sets the name of the library.
-             mmdvm
+        mmdvm
 
-             # Sets the library as a shared library.
-             SHARED
+        # Sets the library as a shared library.
+        SHARED
 
-             # Provides a relative path to your source file(s).
-             mmdvm.cpp )
+        # Provides a relative path to your source file(s).
+        mmdvm.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -31,19 +45,29 @@ add_library( # Sets the name of the library.
 # completing its build.
 
 find_library( # Sets the name of the path variable.
-              log-lib
+        log-lib
 
-              # Specifies the name of the NDK library that
-              # you want CMake to locate.
-              log )
+        # Specifies the name of the NDK library that
+        # you want CMake to locate.
+        log)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       mmdvm
+        mmdvm
 
-                       # Links the target library to the log library
-                       # included in the NDK.
-                       ${log-lib} )
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib})
+
+target_link_libraries(
+        mmdvm
+        libcore
+        libssl
+        libsecdll
+        libmutauth
+        libcrypto
+        libcpp_shared
+)
