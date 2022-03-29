@@ -9,5 +9,6 @@ extern "C"
 JNIEXPORT jstring JNICALL
 Java_cz_okdmr_mmdvm_MainActivity_getNativeString(JNIEnv *env, jobject thiz) {
     BeOn::AmbeVocoder *voice = new BeOn::AmbeVocoder(0);
-    return env->NewStringUTF("Ahoj");
+    voice->decodeInit();
+    return env->NewStringUTF("Ahoj 2");
 }

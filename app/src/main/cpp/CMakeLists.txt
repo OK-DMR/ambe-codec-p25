@@ -10,6 +10,10 @@ cmake_minimum_required(VERSION 3.18.1)
 
 project("mmdvm")
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -Wl,--hash-style=both")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -Wl,--hash-style=both")
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} -Wl,--hash-style=both")
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -18,9 +22,9 @@ project("mmdvm")
 add_library(libssl SHARED IMPORTED)
 set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libssl.so)
 add_library(libsecdll SHARED IMPORTED)
-set_target_properties(libsecdll PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libsecdll.so)
+set_target_properties(libsecdll PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libsecdll.so IMPORTED_NO_SONAME 1)
 add_library(libmutauth SHARED IMPORTED)
-set_target_properties(libmutauth PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libmutauth.so)
+set_target_properties(libmutauth PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libmutauth.so IMPORTED_NO_SONAME 1)
 add_library(libcrypto SHARED IMPORTED)
 set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libcrypto.so)
 add_library(libcpp_shared SHARED IMPORTED)
