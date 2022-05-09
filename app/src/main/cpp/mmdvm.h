@@ -14,7 +14,43 @@ extern "C" {
 
 using namespace oboe;
 
-class IBeOnVocoder;
+const int rY[36] = {
+        0, 2, 0, 2, 0, 2,
+        0, 2, 0, 3, 0, 3,
+        1, 3, 1, 3, 1, 3,
+        1, 3, 1, 3, 1, 3,
+        1, 3, 1, 3, 1, 3,
+        1, 3, 1, 3, 1, 3
+};
+
+const int rZ[36] = {
+        5, 3, 4, 2, 3, 1,
+        2, 0, 1, 13, 0, 12,
+        22, 11, 21, 10, 20, 9,
+        19, 8, 18, 7, 17, 6,
+        16, 5, 15, 4, 14, 3,
+        13, 2, 12, 1, 11, 0
+};
+
+
+const int rW[36] = {
+        0, 1, 0, 1, 0, 1,
+        0, 1, 0, 1, 0, 1,
+        0, 1, 0, 1, 0, 1,
+        0, 1, 0, 1, 0, 2,
+        0, 2, 0, 2, 0, 2,
+        0, 2, 0, 2, 0, 2
+};
+
+const int rX[36] = {
+        23, 10, 22, 9, 21, 8,
+        20, 7, 19, 6, 18, 5,
+        17, 4, 16, 3, 15, 2,
+        14, 1, 13, 0, 12, 10,
+        11, 9, 10, 8, 9, 7,
+        8, 6, 7, 5, 6, 4
+};
+
 
 int32_t
 ambe_voice_dec(int32_t a1, int32_t a2, int32_t a3, int32_t a4, int16_t a5, int16_t a6, int32_t a7);
@@ -81,7 +117,7 @@ namespace BeOn {
          * max-frame-length always 160
          * max-frame-length-in-bytes (FULL_RATE => 11 bytes, HALF_RATE => 7 bytes)
          * */
-        AmbeVocoder(short mode);
+        AmbeVocoder(short mode = 1);
 
         ~AmbeVocoder();
 
@@ -117,29 +153,6 @@ namespace BeOn {
 
         uint32_t getType() const;
     };
-
-    class VoiceEncoderBase {
-        ~VoiceEncoderBase();
-
-        VoiceEncoderBase(BeOn::IBeOnExtendedCore *, BeOn::VoiceProcessor *, IBeOnVocoder *,
-                         std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char> >);
-    };
-
-    class VoiceDecoderAmbeHalfRate {
-        VoiceDecoderAmbeHalfRate(BeOn::IBeOnExtendedCore *, BeOn::VoiceProcessor *, IBeOnVocoder *);
-        //tryToGetCryptoSync(BeOn::IVoiceDecrypter*, unsigned char, int);
-        //decodePdu(unsigned char*, int);
-        //decryptDummyPdu(BeOn::IVoiceDecrypter*, unsigned char);
-        //decryptAndDecodeLdu4V_3(BeOn::IVoiceDecrypter*, int*);
-        //decryptAndDecodeLdu4V_1(BeOn::IVoiceDecrypter*, int*);
-        //getSilenceBufferSize();
-        //decryptAndDecodeLdu4V_U(BeOn::IVoiceDecrypter*, int*);
-        //getVocoderType();
-    };
-
-    class VoiceDecoderAmbeFullRate {
-
-    };
 }
 
 class OboePlayer : public oboe::AudioStreamDataCallback, oboe::AudioStreamErrorCallback {
@@ -170,7 +183,7 @@ public:
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::OboePlayer",
                             "constructor");
         pAmbeVocoder = new BeOn::AmbeVocoder(AmbeVocoderRate::HALF_RATE);
-        //pAmbeVocoder->disablePostDecodeCompression();
+        pAmbeVocoder->disablePostDecodeCompression();
         pAmbeVocoder->encodeInit();
         pAmbeVocoder->decodeInit();
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::OboePlayer",
@@ -212,12 +225,12 @@ public:
         std::lock_guard<std::mutex> lock(mBufferLock);
         for (int i = 0; i < amount; i++) {
             //__android_log_print(ANDROID_LOG_WARN, "OboePlayer::addSamples", "short value %d", samples[i]);
-            mBuffer.push(samples[i]);
+            mBuffer.push(static_cast<short>(samples[i]));
         }
     }
 
-    void addAmbeSamples(unsigned char const ambeData[9]) {
-        short decoded[161] = {0};
+    void addAmbeSamples(unsigned char const *ambeData) {
+        short decoded[160] = {0};
         uint64_t decode_ret = pAmbeVocoder->decode(ambeData, 0, decoded);
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::addAmbeSamples",
                             "pAmbeVocoder->decode returned %lu", decode_ret);
