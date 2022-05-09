@@ -61,6 +61,52 @@ enum BbPttLogLevel {
 };
 void setBbPttCoreLogLevel(uint32_t logLevel);
 
+class VocoderPlugin {
+public:
+    VocoderPlugin() {}
+    void decode_2450(int16_t *pcm,uint8_t *ambe);
+    void decode_2450x1150(int16_t pcm[160],uint8_t ambe[9]);
+    void encode_2450(int16_t *pcm,uint8_t *ambe);
+    void encode_2450x1150(int16_t *pcm,uint8_t *ambe);
+    void process_2450x1150(unsigned char d[9]);
+
+    void deinterleave2450(unsigned char frame[9], char output[]) {
+        const int dW[9][8] = {
+                { 2, 1, 0, 0, 2, 1, 0, 0 }, { 2, 1, 0, 0, 2, 1, 0, 0 },
+                { 3, 1, 0, 0, 3, 1, 0, 0 }, { 3, 1, 1, 0, 3, 1, 1, 0 },
+                { 3, 1, 1, 0, 3, 1, 1, 0 }, { 3, 2, 1, 0, 3, 1, 1, 0 },
+                { 3, 2, 1, 0, 3, 2, 1, 0 }, { 3, 2, 1, 0, 3, 2, 1, 0 },
+                { 3, 2, 1, 0, 3, 2, 1, 0 }
+        };
+        const int dX[9][8] = {
+                { 2, 9, 4, 22, 3, 10, 5, 23 }, { 0, 7, 2, 20, 1, 8, 3, 21 },
+                { 12, 5, 0, 18, 13, 6, 1, 19 }, { 10, 3, 21, 16, 11, 4, 22, 17 },
+                { 8, 1, 19, 14, 9, 2, 20, 15 }, { 6, 10, 17, 12, 7, 0, 18, 13 },
+                { 4, 8, 15, 10, 5, 9, 16, 11 }, { 2, 6, 13, 8, 3, 7, 14, 9 },
+                { 0, 4, 11, 6, 1, 5, 12, 7 }
+        };
+
+
+        char ambe_fr[4][24] = { 0 };
+        char ambe_d[49] = { 0 };
+
+        // deinterleave
+        for (int i = 0; i < 9; ++i) {
+            const int *w = dW[i];
+            const int *x = dX[i];
+            unsigned char frameByte = frame[i];
+            ambe_fr[w[0]][x[0]] = (frameByte >> 0) & 0x01;
+            ambe_fr[w[1]][x[1]] = (frameByte >> 1) & 0x01;
+            ambe_fr[w[2]][x[2]] = (frameByte >> 2) & 0x01;
+            ambe_fr[w[3]][x[3]] = (frameByte >> 3) & 0x01;
+            ambe_fr[w[4]][x[4]] = (frameByte >> 4) & 0x01;
+            ambe_fr[w[5]][x[5]] = (frameByte >> 5) & 0x01;
+            ambe_fr[w[6]][x[6]] = (frameByte >> 6) & 0x01;
+            ambe_fr[w[7]][x[7]] = (frameByte >> 7) & 0x01;
+        }
+    }
+};
+
 enum AmbeVocoderRate {
     FULL_RATE = 0,
     HALF_RATE = 1
@@ -169,15 +215,16 @@ public:
     OboePlayer() {
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::OboePlayer",
                             "constructor");
-        pAmbeVocoder = new BeOn::AmbeVocoder(AmbeVocoderRate::HALF_RATE);
-        //pAmbeVocoder->disablePostDecodeCompression();
-        pAmbeVocoder->encodeInit();
-        pAmbeVocoder->decodeInit();
+        starVocoder = new VocoderPlugin();
+        beonVocoder = new BeOn::AmbeVocoder(AmbeVocoderRate::HALF_RATE);
+        //beonVocoder->disablePostDecodeCompression();
+        beonVocoder->encodeInit();
+        beonVocoder->decodeInit();
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::OboePlayer",
                             "AmbeVocoder type:%d sample-rate:%d max-frame-length:%d max-frame-length-in-bytes:%d",
-                            pAmbeVocoder->getType(), pAmbeVocoder->getSampleRate(),
-                            pAmbeVocoder->getMaxFrameLength(),
-                            pAmbeVocoder->getMaxEncodedFrameLengthInBytes()
+                            beonVocoder->getType(), beonVocoder->getSampleRate(),
+                            beonVocoder->getMaxFrameLength(),
+                            beonVocoder->getMaxEncodedFrameLengthInBytes()
         );
     }
 
@@ -216,12 +263,13 @@ public:
         }
     }
 
-    void addAmbeSamples(unsigned char const ambeData[9]) {
-        short decoded[161] = {0};
-        uint64_t decode_ret = pAmbeVocoder->decode(ambeData, 0, decoded);
-        __android_log_print(ANDROID_LOG_WARN, "OboePlayer::addAmbeSamples",
-                            "pAmbeVocoder->decode returned %lu", decode_ret);
-        this->addSamples(decoded, decode_ret);
+    void addAmbeSamples(unsigned char ambeData[9]) {
+        int16_t pcm[160] = {0};
+        starVocoder->decode_2450x1150(pcm, ambeData);
+        //uint64_t decode_ret = beonVocoder->decode(ambeData, 0, pcm);
+        //__android_log_print(ANDROID_LOG_WARN, "OboePlayer::addAmbeSamples",
+        //                    "beonVocoder->decode returned %lu", decode_ret);
+        //this->addSamples(pcm, decode_ret);
     }
 
 private:
@@ -229,7 +277,8 @@ private:
     std::mutex mBufferLock;
     std::shared_ptr<oboe::AudioStream> mStream;
     std::queue<int16_t> mBuffer;
-    BeOn::AmbeVocoder *pAmbeVocoder;
+    BeOn::AmbeVocoder *beonVocoder;
+    VocoderPlugin *starVocoder;
 
 };
 

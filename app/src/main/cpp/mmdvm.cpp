@@ -13,7 +13,7 @@ Java_cz_okdmr_mmdvm_MainActivity_getNativeString(JNIEnv *env, jobject thiz) {
         globalPlayer = new OboePlayer();
     }
 
-    unsigned char const voicedata[][9] = {
+    unsigned char voicedata[][9] = {
             {107, 42, 0, 115, 97, 82, 129, 232, 185},
             {107, 42, 0, 115, 97, 82, 129, 232, 185},
             {107, 42, 0, 115, 97, 82, 129, 232, 185},
