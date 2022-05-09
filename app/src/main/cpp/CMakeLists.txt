@@ -29,11 +29,12 @@ add_library(libcrypto SHARED IMPORTED)
 set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libcrypto.so)
 #add_library(libcpp_shared SHARED IMPORTED)
 #set_target_properties(libcpp_shared PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libc++_shared.so)
-add_library(libvocoder SHARED IMPORTED)
-set_target_properties(libvocoder PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libvocoder.so IMPORTED_NO_SONAME 1)
+#add_library(libvocoder SHARED IMPORTED)
+#set_target_properties(libvocoder PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libvocoder.so IMPORTED_NO_SONAME 1)
 add_library(libcore SHARED IMPORTED)
 set_target_properties(libcore PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/liblib-core.so)
 
+FILE(GLOB SRCS *.h *.c *.cpp)
 
 add_library( # Sets the name of the library.
         mmdvm
@@ -42,7 +43,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        mmdvm.cpp mmdvm.h)
+        ${SRCS})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -77,7 +78,5 @@ target_link_libraries(
         libsecdll
         libmutauth
         libcrypto
-        libvocoder
         oboe::oboe
- #       libcpp_shared
 )
