@@ -49,18 +49,16 @@
 //       Saved filter state in mem
 //
 //-----------------------------------------------------------------------------
-void dc_rmv(Word16 *sigin, Word16 *sigout, Word32 *mem, Word16 len)
-{
-	Word32 L_tmp, L_mem;
+void dc_rmv(Word16 *sigin, Word16 *sigout, Word32 *mem, Word16 len) {
+    Word32 L_tmp, L_mem;
 
-	L_mem = *mem;
-	while(len--)
-	{
-		L_tmp = L_deposit_h(*sigin++);
-		L_mem = L_add(L_mem, L_tmp);
-		*sigout++ = round(L_mem);
-		L_mem = L_mpy_ls(L_mem, CNST_0_99_Q1_15);
-		L_mem = L_sub(L_mem, L_tmp);
-	}
-	*mem = L_mem;
+    L_mem = *mem;
+    while (len--) {
+        L_tmp = L_deposit_h(*sigin++);
+        L_mem = L_add(L_mem, L_tmp);
+        *sigout++ = round(L_mem);
+        L_mem = L_mpy_ls(L_mem, CNST_0_99_Q1_15);
+        L_mem = L_sub(L_mem, L_tmp);
+    }
+    *mem = L_mem;
 }

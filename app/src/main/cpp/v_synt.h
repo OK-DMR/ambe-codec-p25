@@ -24,6 +24,7 @@
 #define _V_SYNT
 
 void v_synt_init(void);
+
 void v_synt(IMBE_PARAM *imbe_param, Word16 *snd);
 
 

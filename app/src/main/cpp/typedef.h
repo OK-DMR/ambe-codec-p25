@@ -66,6 +66,7 @@ typedef int Flag;
  * use (improved) type definition file typdefs.h and add a "Flag" type
  */
 #include "typedefs.h"
+
 typedef int Flag;
 
 #endif

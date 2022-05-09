@@ -244,11 +244,9 @@ mbe_dequantizeAmbe2400Parms(mbe_parms *cur_mp, mbe_parms *prev_mp, const int *b)
 int
 mbe_dequantizeAmbe2250Parms(mbe_parms *cur_mp, mbe_parms *prev_mp, const int *b);
 
-class VocoderPlugin : public Vocoder
-{
+class VocoderPlugin : public Vocoder {
 public:
-    VocoderPlugin()
-    {
+    VocoderPlugin() {
         m_mbelibParms = new mbelibParms();
         m_audio_out_temp_buf_p = m_audio_out_temp_buf;
 
@@ -261,8 +259,7 @@ public:
         memset(ambe_d, 0, 49);
     }
 
-    virtual void decode_2400x1200(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void decode_2400x1200(int16_t *pcm, uint8_t *ambe) {
         int samples = 0;
         process_2400x1200(ambe);
         int16_t *p = getAudio(samples);
@@ -270,8 +267,7 @@ public:
         resetAudio();
     }
 
-    virtual void decode_2450x1150(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void decode_2450x1150(int16_t *pcm, uint8_t *ambe) {
         int samples = 0;
         process_2450x1150(ambe);
         int16_t *p = getAudio(samples);
@@ -279,8 +275,7 @@ public:
         resetAudio();
     }
 
-    virtual void decode_2450(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void decode_2450(int16_t *pcm, uint8_t *ambe) {
         int samples = 0;
         process_2450(ambe);
         int16_t *p = getAudio(samples);
@@ -288,10 +283,9 @@ public:
         resetAudio();
     }
 
-    virtual void encode_2400x1200(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void encode_2400x1200(int16_t *pcm, uint8_t *ambe) {
         int b[9];
-        int16_t frame_vector[8];	// result ignored
+        int16_t frame_vector[8];    // result ignored
         uint8_t ambe_frame[72];
 
         uint8_t pbuf[48];
@@ -301,16 +295,16 @@ public:
         vocoder.imbe_encode(frame_vector, pcm);
         encode_ambe(vocoder.param(), b, &cur_mp, &prev_mp, true, 1.0);
 
-        for (int i=0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) {
             store_reg(b[i], &tbuf[tbufp], b_lengths[i]);
             tbufp += b_lengths[i];
         }
 
-        for (int i=0; i < 48; i++)
+        for (int i = 0; i < 48; i++)
             pbuf[i] = tbuf[m_list[i]];
 
-        int u0 = load_reg(pbuf+0, 12);
-        int u1 = load_reg(pbuf+12, 12);
+        int u0 = load_reg(pbuf + 0, 12);
+        int u1 = load_reg(pbuf + 12, 12);
 
         int m1 = PRNG_TABLE[u0];
         int c0 = golay_24_encode(u0);
@@ -318,21 +312,20 @@ public:
 
         uint8_t pre_buf[72];
         store_reg(c0, pre_buf, 24);
-        store_reg(c1, pre_buf+24, 24);
-        memcpy(pre_buf+48, pbuf+24, 24);
+        store_reg(c1, pre_buf + 24, 24);
+        memcpy(pre_buf + 48, pbuf + 24, 24);
 
-        for (int i=0; i < 72; i++)
+        for (int i = 0; i < 72; i++)
             ambe_frame[d_list[i]] = pre_buf[i];
 
-        for(int i = 0; i < 9; ++i){
-            for(int j = 0; j < 8; ++j){
-                ambe[i] |= (ambe_frame[(i*8)+j] << j);
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                ambe[i] |= (ambe_frame[(i * 8) + j] << j);
             }
         }
     }
 
-    virtual void encode_2450x1150(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void encode_2450x1150(int16_t *pcm, uint8_t *ambe) {
         unsigned int aOrig = 0U;
         unsigned int bOrig = 0U;
         unsigned int cOrig = 0U;
@@ -386,10 +379,9 @@ public:
         }
     }
 
-    virtual void encode_2450(int16_t *pcm, uint8_t *ambe)
-    {
+    virtual void encode_2450(int16_t *pcm, uint8_t *ambe) {
         int b[9];
-        int16_t frame_vector[8];	// result ignored
+        int16_t frame_vector[8];    // result ignored
         uint8_t ambe_frame[49];
 
         vocoder.imbe_encode(frame_vector, pcm);
@@ -445,12 +437,13 @@ public:
         ambe_frame[47] = (b[8] >> 1) & 1;
         ambe_frame[48] = b[8] & 1;
 
-        for(int i = 0; i < 7; ++i){
-            for(int j = 0; j < 8; ++j){
-                ambe[i] |= (ambe_frame[(i*8)+j] << (7-j));
+        for (int i = 0; i < 7; ++i) {
+            for (int j = 0; j < 8; ++j) {
+                ambe[i] |= (ambe_frame[(i * 8) + j] << (7 - j));
             }
         }
     }
+
 private:
     imbe_vocoder vocoder;
     mbe_parms cur_mp;
@@ -465,43 +458,43 @@ private:
     float m_aout_max_buf[200];
     float *m_aout_max_buf_p;
     int m_aout_max_buf_idx;
-    short m_audio_out_buf[2*48000];    //!< final result - 1s of L+R S16LE samples
+    short m_audio_out_buf[2 * 48000];    //!< final result - 1s of L+R S16LE samples
     short *m_audio_out_buf_p;
-    int   m_audio_out_nb_samples;
-    int   m_audio_out_buf_size;
+    int m_audio_out_nb_samples;
+    int m_audio_out_buf_size;
     const int *w, *x, *y, *z;
     char ambe_d[49];
 
-    void initMbeParms()
-    {
-        mbe_initMbeParms(m_mbelibParms->m_cur_mp, m_mbelibParms->m_prev_mp, m_mbelibParms->m_prev_mp_enhanced);
+    void initMbeParms() {
+        mbe_initMbeParms(m_mbelibParms->m_cur_mp, m_mbelibParms->m_prev_mp,
+                         m_mbelibParms->m_prev_mp_enhanced);
         //m_errs = 0;
         m_errs2 = 0;
         m_err_str[0] = 0;
     }
 
-    void process_2400x1200(unsigned char *d)
-    {
+    void process_2400x1200(unsigned char *d) {
         char ambe_fr[4][24];
 
         memset(ambe_fr, 0, 96);
         w = dW;
         x = dX;
 
-        for(int i = 0; i < 9; ++i){
-            for(int j = 0; j < 8; ++j){
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 8; ++j) {
                 ambe_fr[*w][*x] = (1 & (d[i] >> j));
                 w++;
                 x++;
             }
         }
 
-        mbe_processAmbe3600x2400Framef(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_fr, ambe_d,m_mbelibParms-> m_cur_mp, m_mbelibParms->m_prev_mp, m_mbelibParms->m_prev_mp_enhanced, 3);
+        mbe_processAmbe3600x2400Framef(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_fr, ambe_d,
+                                       m_mbelibParms->m_cur_mp, m_mbelibParms->m_prev_mp,
+                                       m_mbelibParms->m_prev_mp_enhanced, 3);
         processAudio();
     }
 
-    void process_2450x1150(unsigned char *d)
-    {
+    void process_2450x1150(unsigned char *d) {
         char ambe_fr[4][24];
 
         memset(ambe_fr, 0, 96);
@@ -510,9 +503,9 @@ private:
         y = rY;
         z = rZ;
 
-        for(int i = 0; i < 9; ++i){
-            for(int j = 0; j < 8; j+=2){
-                ambe_fr[*y][*z] = (1 & (d[i] >> (7 - (j+1))));
+        for (int i = 0; i < 9; ++i) {
+            for (int j = 0; j < 8; j += 2) {
+                ambe_fr[*y][*z] = (1 & (d[i] >> (7 - (j + 1))));
                 ambe_fr[*w][*x] = (1 & (d[i] >> (7 - j)));
                 w++;
                 x++;
@@ -521,56 +514,54 @@ private:
             }
         }
 
-        mbe_processAmbe3600x2450Framef(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_fr, ambe_d,m_mbelibParms-> m_cur_mp, m_mbelibParms->m_prev_mp, m_mbelibParms->m_prev_mp_enhanced, 3);
+        mbe_processAmbe3600x2450Framef(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_fr, ambe_d,
+                                       m_mbelibParms->m_cur_mp, m_mbelibParms->m_prev_mp,
+                                       m_mbelibParms->m_prev_mp_enhanced, 3);
         processAudio();
     }
 
-    void process_2450(unsigned char *d)
-    {
+    void process_2450(unsigned char *d) {
         char ambe_data[49];
         char dvsi_data[7];
         memset(dvsi_data, 0, 7);
 
-        for(int i = 0; i < 6; ++i){
-            for(int j = 0; j < 8; j++){
-                ambe_data[j+(8*i)] = (1 & (d[i] >> (7 - j)));
+        for (int i = 0; i < 6; ++i) {
+            for (int j = 0; j < 8; j++) {
+                ambe_data[j + (8 * i)] = (1 & (d[i] >> (7 - j)));
             }
         }
         ambe_data[48] = (1 & (d[6] >> 7));
         processData(ambe_data);
     }
 
-    void processData(char ambe_data[49])
-    {
-        mbe_processAmbe2450Dataf(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_data, m_mbelibParms->m_cur_mp,m_mbelibParms->m_prev_mp, m_mbelibParms->m_prev_mp_enhanced, 3);
+    void processData(char ambe_data[49]) {
+        mbe_processAmbe2450Dataf(m_audio_out_temp_buf, &m_errs2, m_err_str, ambe_data,
+                                 m_mbelibParms->m_cur_mp, m_mbelibParms->m_prev_mp,
+                                 m_mbelibParms->m_prev_mp_enhanced, 3);
         processAudio();
     }
 
-    short *getAudio(int& nbSamples)
-    {
+    short *getAudio(int &nbSamples) {
         nbSamples = m_audio_out_nb_samples;
         return m_audio_out_buf;
     }
 
-    void resetAudio()
-    {
+    void resetAudio() {
         m_audio_out_nb_samples = 0;
         m_audio_out_buf_p = m_audio_out_buf;
     }
 
-    void processAudio()
-    {
+    void processAudio() {
         m_audio_out_temp_buf_p = m_audio_out_temp_buf;
 
-        if (m_audio_out_nb_samples + 160 >= m_audio_out_buf_size){
+        if (m_audio_out_nb_samples + 160 >= m_audio_out_buf_size) {
             resetAudio();
         }
 
-        for (int i = 0; i < 160; i++){
-            if (*m_audio_out_temp_buf_p > static_cast<float>(32760)){
+        for (int i = 0; i < 160; i++) {
+            if (*m_audio_out_temp_buf_p > static_cast<float>(32760)) {
                 *m_audio_out_temp_buf_p = static_cast<float>(32760);
-            }
-            else if (*m_audio_out_temp_buf_p < static_cast<float>(-32760)){
+            } else if (*m_audio_out_temp_buf_p < static_cast<float>(-32760)) {
                 *m_audio_out_temp_buf_p = static_cast<float>(-32760);
             }
 

@@ -28,12 +28,11 @@
 #include "pe_lpf.h"
 
 
-
 static const Word16 lpf_coef[PE_LPF_ORD] =
-{
-	 -94,  -92,  185,   543,  288, -883, -1834, -495, 3891, 9141, 11512,        
-	9141, 3891, -495, -1834, -883,  288,   543,  185,  -92,  -94
-};
+        {
+                -94, -92, 185, 543, 288, -883, -1834, -495, 3891, 9141, 11512,
+                9141, 3891, -495, -1834, -883, 288, 543, 185, -92, -94
+        };
 
 
 //-----------------------------------------------------------------------------
@@ -54,21 +53,19 @@ static const Word16 lpf_coef[PE_LPF_ORD] =
 //       Saved filter state in mem
 //
 //-----------------------------------------------------------------------------
-void pe_lpf(Word16 *sigin, Word16 *sigout, Word16 *mem, Word16 len)
-{
-	Word16 i;
-	Word32 L_sum;
+void pe_lpf(Word16 *sigin, Word16 *sigout, Word16 *mem, Word16 len) {
+    Word16 i;
+    Word32 L_sum;
 
-	while(len--)
-	{
-		for(i = 0; i < PE_LPF_ORD - 1; i++)
-			mem[i] = mem[i + 1];
-		mem[PE_LPF_ORD - 1] = *sigin++;
+    while (len--) {
+        for (i = 0; i < PE_LPF_ORD - 1; i++)
+            mem[i] = mem[i + 1];
+        mem[PE_LPF_ORD - 1] = *sigin++;
 
-		L_sum = 0;
-		for(i = 0; i < PE_LPF_ORD; i++)
-			L_sum = L_mac(L_sum, mem[i], lpf_coef[i]);
+        L_sum = 0;
+        for (i = 0; i < PE_LPF_ORD; i++)
+            L_sum = L_mac(L_sum, mem[i], lpf_coef[i]);
 
-		*sigout++ = round(L_sum);
-	}
+        *sigout++ = round(L_sum);
+    }
 }

@@ -42,19 +42,17 @@
 //		Quantized Value in signed (bit_num).16 format
 //
 //-----------------------------------------------------------------------------
-Word32 deqnt_by_step(Word16 qval, UWord16 step_size, Word16 bit_num)
-{
-	Word32 res;
+Word32 deqnt_by_step(Word16 qval, UWord16 step_size, Word16 bit_num) {
+    Word32 res;
 
-	if(bit_num == 0)
-		return (Word32)0;
+    if (bit_num == 0)
+        return (Word32) 0;
 
-	res = (Word32)step_size * (qval -  (1 << (bit_num - 1)));
-	res = L_add(res, ((Word32)step_size * CNST_0_5_Q0_16) >> 16);
+    res = (Word32) step_size * (qval - (1 << (bit_num - 1)));
+    res = L_add(res, ((Word32) step_size * CNST_0_5_Q0_16) >> 16);
 
-	return res;
+    return res;
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -74,27 +72,28 @@ Word32 deqnt_by_step(Word16 qval, UWord16 step_size, Word16 bit_num)
 //		Quantized Value in integer
 //
 //-----------------------------------------------------------------------------
-Word16 qnt_by_step(Word16 val, UWord16 step_size, Word16 bit_num)
-{
-	Word16 index, min_val, max_val;
-	Word16 q_index, shift, tmp;
+Word16 qnt_by_step(Word16 val, UWord16 step_size, Word16 bit_num) {
+    Word16 index, min_val, max_val;
+    Word16 q_index, shift, tmp;
 
-	shift = norm_s(step_size);
-	
-	tmp = div_s(0x4000, shl(step_size, shift));     // Remark: To get result in Qxx.16 format it is necessary left shift tmp by (shift + 3) 
-	q_index = shr_r(mult(val, tmp), sub(9, shift)); // q_index here is rounded to the nearest integer
-	
-	max_val = 1 << (bit_num - 1);
-	min_val = negate(max_val);
+    shift = norm_s(step_size);
 
-	if(q_index < min_val)
-		index = 0;
-	else if(q_index >= max_val)
-		index = (1 << bit_num) - 1;	
-	else
-		index = max_val + q_index;
-			
-	return index;
+    tmp = div_s(0x4000, shl(step_size,
+                            shift));     // Remark: To get result in Qxx.16 format it is necessary left shift tmp by (shift + 3)
+    q_index = shr_r(mult(val, tmp),
+                    sub(9, shift)); // q_index here is rounded to the nearest integer
+
+    max_val = 1 << (bit_num - 1);
+    min_val = negate(max_val);
+
+    if (q_index < min_val)
+        index = 0;
+    else if (q_index >= max_val)
+        index = (1 << bit_num) - 1;
+    else
+        index = max_val + q_index;
+
+    return index;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,31 +113,29 @@ Word16 qnt_by_step(Word16 val, UWord16 step_size, Word16 bit_num)
 //		Quantized Value in integer
 //
 //-----------------------------------------------------------------------------
-Word16 tbl_quant(Word16 val, Word16 *q_tbl, Word16 q_tbl_size)
-{
-	Word16 min_index, max_index, index;
+Word16 tbl_quant(Word16 val, Word16 *q_tbl, Word16 q_tbl_size) {
+    Word16 min_index, max_index, index;
 
-	min_index = 0;
-	max_index = q_tbl_size - 1;
+    min_index = 0;
+    max_index = q_tbl_size - 1;
 
-	if(val >= q_tbl[max_index])
-		return max_index;
+    if (val >= q_tbl[max_index])
+        return max_index;
 
-	if(val <= q_tbl[min_index])
-		return min_index;
+    if (val <= q_tbl[min_index])
+        return min_index;
 
-	while(max_index - min_index != 1)
-	{
-		index = min_index + ((max_index - min_index) >> 1);            
+    while (max_index - min_index != 1) {
+        index = min_index + ((max_index - min_index) >> 1);
 
-		if(q_tbl[index] > val)
-			max_index = index;
-		else
-			min_index = index;
-	}
+        if (q_tbl[index] > val)
+            max_index = index;
+        else
+            min_index = index;
+    }
 
-	if(q_tbl[max_index] - val <= val - q_tbl[min_index])
-		return max_index;
-	else
-		return min_index;
+    if (q_tbl[max_index] - val <= val - q_tbl[min_index])
+        return max_index;
+    else
+        return min_index;
 }

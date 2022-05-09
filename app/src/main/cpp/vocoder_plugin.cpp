@@ -19,7 +19,6 @@
 #define VOCODER_PLUGIN_C
 
 
-
 uint32_t golay_24_encode(uint32_t code_word_in) {
     static const uint32_t encoding[12] = {
             040006165,
@@ -778,7 +777,6 @@ void encode_ambe(const IMBE_PARAM *imbe_param, int b[], mbe_parms *cur_mp, mbe_p
         mbe_dequantizeAmbe2250Parms(cur_mp, prev_mp, b);
     mbe_moveMbeParms(cur_mp, prev_mp);
 }
-
 
 
 #endif

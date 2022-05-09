@@ -38,27 +38,25 @@
 #define B_NUM           (NUM_HARMS_MAX - 1)
 
 
-typedef struct 
-{
-	Word16 e_p;
-	Word16 pitch;                 // Q14.2
-	Word16 ref_pitch;             // Q8.8 
-	Word32 fund_freq;
-	Word16 num_harms;
-	Word16 num_bands;
-	Word16 v_uv_dsn[NUM_HARMS_MAX];
-	Word16 b_vec[NUM_HARMS_MAX + 3];
-	Word16 bit_alloc[B_NUM + 4];
-	Word16 sa[NUM_HARMS_MAX];
-	Word16 l_uv;
-	Word16 div_one_by_num_harm;
-	Word16 div_one_by_num_harm_sh;
+typedef struct {
+    Word16 e_p;
+    Word16 pitch;                 // Q14.2
+    Word16 ref_pitch;             // Q8.8
+    Word32 fund_freq;
+    Word16 num_harms;
+    Word16 num_bands;
+    Word16 v_uv_dsn[NUM_HARMS_MAX];
+    Word16 b_vec[NUM_HARMS_MAX + 3];
+    Word16 bit_alloc[B_NUM + 4];
+    Word16 sa[NUM_HARMS_MAX];
+    Word16 l_uv;
+    Word16 div_one_by_num_harm;
+    Word16 div_one_by_num_harm_sh;
 } IMBE_PARAM;
 
-typedef struct  
-{
-	Word16 re;
-	Word16 im;
+typedef struct {
+    Word16 re;
+    Word16 im;
 } Cmplx16;
 
 #if 0

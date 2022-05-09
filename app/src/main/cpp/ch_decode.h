@@ -27,6 +27,7 @@
 #define BIT_STREAM_LEN  (3 + 3*12 + 3*11 + 3)
 
 void decode_frame_vector(IMBE_PARAM *imbe_param, Word16 *frame_vector);
+
 void v_uv_decode(IMBE_PARAM *imbe_param);
 
 #endif

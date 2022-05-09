@@ -22,47 +22,49 @@
 #define B_NUM           (NUM_HARMS_MAX - 1)
 
 
-typedef struct 
-{
-	short e_p;
-	short pitch;                 // Q14.2
-	short ref_pitch;             // Q8.8 
-	int fund_freq;
-	short num_harms;
-	short num_bands;
-	short v_uv_dsn[NUM_HARMS_MAX];
-	short b_vec[NUM_HARMS_MAX + 3];
-	short bit_alloc[B_NUM + 4];
-	short sa[NUM_HARMS_MAX];
-	short l_uv;
-	short div_one_by_num_harm;
-	short div_one_by_num_harm_sh;
+typedef struct {
+    short e_p;
+    short pitch;                 // Q14.2
+    short ref_pitch;             // Q8.8
+    int fund_freq;
+    short num_harms;
+    short num_bands;
+    short v_uv_dsn[NUM_HARMS_MAX];
+    short b_vec[NUM_HARMS_MAX + 3];
+    short bit_alloc[B_NUM + 4];
+    short sa[NUM_HARMS_MAX];
+    short l_uv;
+    short div_one_by_num_harm;
+    short div_one_by_num_harm_sh;
 } IMBE_PARAM;
 
-typedef struct  
-{
-	short re;
-	short im;
+typedef struct {
+    short re;
+    short im;
 } Cmplx16;
 
 class imbe_vocoder_impl;
-class imbe_vocoder
-{
+
+class imbe_vocoder {
 public:
-    imbe_vocoder(void);	// constructor
-    ~imbe_vocoder();   	// destructor
+    imbe_vocoder(void);    // constructor
+    ~imbe_vocoder();    // destructor
     // imbe_encode compresses 160 samples (in unsigned int format)
     // outputs u[] vectors as frame_vector[]
     void imbe_encode(int16_t *frame_vector, int16_t *snd);
-    
+
     // imbe_decode decodes IMBE codewords (frame_vector),
     // outputs the resulting 160 audio samples (snd)
     void imbe_decode(int16_t *frame_vector, int16_t *snd);
-	void encode_4400(int16_t *snd, uint8_t *imbe);
-	void decode_4400(int16_t *snd, uint8_t *imbe);
-    const IMBE_PARAM* param(void);
+
+    void encode_4400(int16_t *snd, uint8_t *imbe);
+
+    void decode_4400(int16_t *snd, uint8_t *imbe);
+
+    const IMBE_PARAM *param(void);
 
 private:
     imbe_vocoder_impl *Impl;
 };
+
 #endif /* INCLUDED_IMBE_VOCODER_H */

@@ -25,6 +25,7 @@
 
 
 void sa_encode_init(void);
+
 void sa_encode(IMBE_PARAM *imbe_param);
 
 #endif

@@ -39,19 +39,18 @@
 //		Pointer to bits allocation array 
 //
 //-----------------------------------------------------------------------------
-const UWord16 *get_bit_allocation_arr(Word16 num_harms)
-{
+const UWord16 *get_bit_allocation_arr(Word16 num_harms) {
     UWord16 offset_in_word;
     Word16 index;
 
-	if(num_harms == NUM_HARMS_MIN)
-		return &bit_allocation_tbl[0];
-	else
-	{
-		index = num_harms - NUM_HARMS_MIN - 1;
-		offset_in_word = bit_allocation_offset_tbl[index >> 2] + ((3 + (index >> 2)) * (index & 0x3));
-		return &bit_allocation_tbl[offset_in_word];
-	}
+    if (num_harms == NUM_HARMS_MIN)
+        return &bit_allocation_tbl[0];
+    else {
+        index = num_harms - NUM_HARMS_MIN - 1;
+        offset_in_word =
+                bit_allocation_offset_tbl[index >> 2] + ((3 + (index >> 2)) * (index & 0x3));
+        return &bit_allocation_tbl[offset_in_word];
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -69,23 +68,24 @@ const UWord16 *get_bit_allocation_arr(Word16 num_harms)
 //		None 
 //
 //-----------------------------------------------------------------------------
-void get_bit_allocation(Word16 num_harms, Word16 *ptr)
-{
-	const UWord16 *bat_ptr;
+void get_bit_allocation(Word16 num_harms, Word16 *ptr) {
+    const UWord16 *bat_ptr;
     UWord16 tmp;
     Word16 i;
 
-	bat_ptr = get_bit_allocation_arr(num_harms);
+    bat_ptr = get_bit_allocation_arr(num_harms);
 
-	for(i = 0; i < num_harms - 1; i += 4)
-	{
-		tmp = *bat_ptr++;
-		ptr[3] = tmp & 0xF; tmp >>= 4;
-		ptr[2] = tmp & 0xF; tmp >>= 4;
-		ptr[1] = tmp & 0xF; tmp >>= 4;
-		ptr[0] = tmp & 0xF; 
-		ptr += 4;
-	}
+    for (i = 0; i < num_harms - 1; i += 4) {
+        tmp = *bat_ptr++;
+        ptr[3] = tmp & 0xF;
+        tmp >>= 4;
+        ptr[2] = tmp & 0xF;
+        tmp >>= 4;
+        ptr[1] = tmp & 0xF;
+        tmp >>= 4;
+        ptr[0] = tmp & 0xF;
+        ptr += 4;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -103,10 +103,9 @@ void get_bit_allocation(Word16 num_harms, Word16 *ptr)
 //		None 
 //
 //-----------------------------------------------------------------------------
-void v_zap(Word16 *vec, Word16 n)
-{
-	while(n--)
-		*vec++ = 0;
+void v_zap(Word16 *vec, Word16 n) {
+    while (n--)
+        *vec++ = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,10 +124,9 @@ void v_zap(Word16 *vec, Word16 n)
 //		None 
 //
 //-----------------------------------------------------------------------------
-void v_equ(Word16 *vec1, Word16 *vec2, Word16 n)
-{
-	while(n--)
-		*vec1++ = *vec2++;
+void v_equ(Word16 *vec1, Word16 *vec2, Word16 n) {
+    while (n--)
+        *vec1++ = *vec2++;
 }
 
 //-----------------------------------------------------------------------------
@@ -147,17 +145,15 @@ void v_equ(Word16 *vec1, Word16 *vec2, Word16 n)
 //		32 bit long signed integer result  
 //
 //-----------------------------------------------------------------------------
-Word32 L_v_magsq(Word16 *vec, Word16 n)
-{
-	Word32 L_magsq = 0;
+Word32 L_v_magsq(Word16 *vec, Word16 n) {
+    Word32 L_magsq = 0;
 
-	while(n--)
-	{
-		L_magsq = L_mac(L_magsq, *vec, *vec);
-		vec++;
-	}
-	return L_magsq;
-} 
+    while (n--) {
+        L_magsq = L_mac(L_magsq, *vec, *vec);
+        vec++;
+    }
+    return L_magsq;
+}
 
 //-----------------------------------------------------------------------------
 //	PURPOSE:
@@ -176,9 +172,8 @@ Word32 L_v_magsq(Word16 *vec, Word16 n)
 //		None 
 //
 //-----------------------------------------------------------------------------
-void v_equ_shr(Word16 *vec1, Word16 *vec2, Word16 scale, Word16 n)
-{
-	while(n--)
-		*vec1++ = shr(*vec2++,scale);   
+void v_equ_shr(Word16 *vec1, Word16 *vec2, Word16 scale, Word16 n) {
+    while (n--)
+        *vec1++ = shr(*vec2++, scale);
 }
 

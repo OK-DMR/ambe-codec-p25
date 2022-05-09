@@ -28,8 +28,8 @@
 // Bit allocation and ancillary tables
 //
 //-----------------------------------------------------------------------------
-extern const UWord16 bit_allocation_tbl[]; 
-extern const UWord16 bit_allocation_offset_tbl[]; 
+extern const UWord16 bit_allocation_tbl[];
+extern const UWord16 bit_allocation_offset_tbl[];
 
 //-----------------------------------------------------------------------------
 //

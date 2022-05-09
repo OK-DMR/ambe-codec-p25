@@ -16,25 +16,23 @@
 #define MBELIB_H_
 
 #include <stdlib.h>
+
 extern "C" {
 #include "mbelib.h"
 
 
-struct mbelibParms
-{
+struct mbelibParms {
     mbe_parms *m_cur_mp;
     mbe_parms *m_prev_mp;
     mbe_parms *m_prev_mp_enhanced;
 
-    mbelibParms()
-    {
+    mbelibParms() {
         m_cur_mp = (mbe_parms *) malloc(sizeof(mbe_parms));
         m_prev_mp = (mbe_parms *) malloc(sizeof(mbe_parms));
         m_prev_mp_enhanced = (mbe_parms *) malloc(sizeof(mbe_parms));
     }
 
-    ~mbelibParms()
-    {
+    ~mbelibParms() {
         free(m_prev_mp_enhanced);
         free(m_prev_mp);
         free(m_cur_mp);

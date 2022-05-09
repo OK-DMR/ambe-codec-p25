@@ -24,6 +24,7 @@
 #define _PITCH_EST
 
 void pitch_est_init(void);
+
 void pitch_est(IMBE_PARAM *imbe_param, Word16 *frames_buf);
 
 #endif

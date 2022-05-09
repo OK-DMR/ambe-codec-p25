@@ -32,76 +32,62 @@
 #include "imbe_vocoder_impl.h"
 
 
-
-
-void imbe_vocoder_impl::uv_synt_init(void)
-{
-	fft_init();
-	v_zap(uv_mem, 105);
+void imbe_vocoder_impl::uv_synt_init(void) {
+    fft_init();
+    v_zap(uv_mem, 105);
 }
 
 
-
-
-
-
-void imbe_vocoder_impl::uv_synt(IMBE_PARAM *imbe_param, Word16 *snd)
-{
-	Cmplx16 Uw[FFTLENGTH];
-	Word16 i, index_a, index_b, index_aux, ha, hb, *v_uv_dsn_ptr, *sa_ptr, sa;
+void imbe_vocoder_impl::uv_synt(IMBE_PARAM *imbe_param, Word16 *snd) {
+    Cmplx16 Uw[FFTLENGTH];
+    Word16 i, index_a, index_b, index_aux, ha, hb, *v_uv_dsn_ptr, *sa_ptr, sa;
     Word32 fund_freq, fund_freq_2, fund_freq_acc_a, fund_freq_acc_b;
 
-	sa_ptr       = imbe_param->sa;
-	v_uv_dsn_ptr = imbe_param->v_uv_dsn;
-	fund_freq    = imbe_param->fund_freq;
-	fund_freq_2  = L_shr(fund_freq, 1);
+    sa_ptr = imbe_param->sa;
+    v_uv_dsn_ptr = imbe_param->v_uv_dsn;
+    fund_freq = imbe_param->fund_freq;
+    fund_freq_2 = L_shr(fund_freq, 1);
 
-	v_zap((Word16 *)&Uw, 2 * FFTLENGTH);
+    v_zap((Word16 *) &Uw, 2 * FFTLENGTH);
 
-	fund_freq_acc_a = L_sub(fund_freq, fund_freq_2);
-	fund_freq_acc_b = L_add(fund_freq, fund_freq_2);
+    fund_freq_acc_a = L_sub(fund_freq, fund_freq_2);
+    fund_freq_acc_b = L_add(fund_freq, fund_freq_2);
 
-	for(i = 0; i < imbe_param->num_harms; i++)
-	{
-		ha = extract_h(fund_freq_acc_a);
-		hb = extract_h(fund_freq_acc_b);
-		index_a = (ha >> 8) + ((ha & 0xFF)?1:0);
-		index_b = (hb >> 8) + ((hb & 0xFF)?1:0);
+    for (i = 0; i < imbe_param->num_harms; i++) {
+        ha = extract_h(fund_freq_acc_a);
+        hb = extract_h(fund_freq_acc_b);
+        index_a = (ha >> 8) + ((ha & 0xFF) ? 1 : 0);
+        index_b = (hb >> 8) + ((hb & 0xFF) ? 1 : 0);
 
-		index_aux = 256 - index_a;
+        index_aux = 256 - index_a;
 
-		sa = shl(*sa_ptr, 3);
+        sa = shl(*sa_ptr, 3);
 
-		if(*v_uv_dsn_ptr++)
-		{
-			while(index_a < index_b)
-			{
-				Uw[index_a].re   = Uw[index_a].im   = 0;
-				Uw[index_aux].re = Uw[index_aux].im = 0;
-				index_a++;
-				index_aux--;
-			}
-		}
-		else
-		{			
-			while(index_a < index_b)
-			{
-				Uw[index_a].re = mult(sa, rand_gen());
-				Uw[index_a].im = mult(sa, rand_gen());
-				//Uw[index_a].re = sa;
-				//Uw[index_a].im = sa;
+        if (*v_uv_dsn_ptr++) {
+            while (index_a < index_b) {
+                Uw[index_a].re = Uw[index_a].im = 0;
+                Uw[index_aux].re = Uw[index_aux].im = 0;
+                index_a++;
+                index_aux--;
+            }
+        } else {
+            while (index_a < index_b) {
+                Uw[index_a].re = mult(sa, rand_gen());
+                Uw[index_a].im = mult(sa, rand_gen());
+                //Uw[index_a].re = sa;
+                //Uw[index_a].im = sa;
 
-				Uw[index_aux].re = Uw[index_a].re;
-				Uw[index_aux].im = negate(Uw[index_a].im);
-				index_a++;
-				index_aux--;
-			}
-		}
+                Uw[index_aux].re = Uw[index_a].re;
+                Uw[index_aux].im = negate(Uw[index_a].im);
+                index_a++;
+                index_aux--;
+            }
+        }
 
-		fund_freq_acc_a = L_add(fund_freq_acc_a, fund_freq);
-		fund_freq_acc_b = L_add(fund_freq_acc_b, fund_freq);
-		sa_ptr++;
-	}
+        fund_freq_acc_a = L_add(fund_freq_acc_a, fund_freq);
+        fund_freq_acc_b = L_add(fund_freq_acc_b, fund_freq);
+        sa_ptr++;
+    }
 
 /*
 	j = 128;
@@ -117,31 +103,31 @@ void imbe_vocoder_impl::uv_synt(IMBE_PARAM *imbe_param, Word16 *snd)
 */
 
 
-	fft((Word16 *)&Uw, FFTLENGTH, -1);
+    fft((Word16 *) &Uw, FFTLENGTH, -1);
 
-	for(i = 0; i < 105; i++)
-		snd[i] = uv_mem[i];
+    for (i = 0; i < 105; i++)
+        snd[i] = uv_mem[i];
 
-	index_aux = 73;
-	for(i = 105; i < FRAME; i++)
-		snd[i] = shl(Uw[index_aux++].re, 3);
+    index_aux = 73;
+    for (i = 105; i < FRAME; i++)
+        snd[i] = shl(Uw[index_aux++].re, 3);
 
 
-	// Weighted Overlap Add Algorithm
-	index_aux = 24;
-	index_a   = 0;
-	index_b   = 48;
-	for(i = 56; i < 105; i++)
-	{
-		snd[i] = extract_h(L_add(L_mult(snd[i], ws[index_b]), L_mult(shl(Uw[index_aux].re, 3), ws[index_a])));
+    // Weighted Overlap Add Algorithm
+    index_aux = 24;
+    index_a = 0;
+    index_b = 48;
+    for (i = 56; i < 105; i++) {
+        snd[i] = extract_h(
+                L_add(L_mult(snd[i], ws[index_b]), L_mult(shl(Uw[index_aux].re, 3), ws[index_a])));
 
-		index_aux++;
-		index_a++;
-		index_b--;
-	}
-	
-	index_aux = 128;
-	for(i = 0; i < 105; i++)
-		uv_mem[i] = shl(Uw[index_aux++].re, 3);
+        index_aux++;
+        index_a++;
+        index_b--;
+    }
+
+    index_aux = 128;
+    for (i = 0; i < 105; i++)
+        uv_mem[i] = shl(Uw[index_aux++].re, 3);
 }
 

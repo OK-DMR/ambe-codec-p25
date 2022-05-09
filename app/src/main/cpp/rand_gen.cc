@@ -42,20 +42,19 @@ static UWord32 seed = 1;
 //		        Pseudo-random number in signed Q1.16 format
 //
 //-----------------------------------------------------------------------------
-Word16 rand_gen(void)
-{
-	UWord32 hi, lo;
+Word16 rand_gen(void) {
+    UWord32 hi, lo;
 
-	lo = 16807 * (seed & 0xFFFF);
-	hi = 16807 * (seed >> 16);
+    lo = 16807 * (seed & 0xFFFF);
+    hi = 16807 * (seed >> 16);
 
-	lo += (Word32)(hi & 0x7FFF) << 16;
-	lo += (hi >> 15);
+    lo += (Word32) (hi & 0x7FFF) << 16;
+    lo += (hi >> 15);
 
-	if(lo > 0x7FFFFFFF)
-		lo -= 0x7FFFFFFF;
+    if (lo > 0x7FFFFFFF)
+        lo -= 0x7FFFFFFF;
 
-	seed = lo;
+    seed = lo;
 
-	return (Word16)lo;
+    return (Word16) lo;
 }
