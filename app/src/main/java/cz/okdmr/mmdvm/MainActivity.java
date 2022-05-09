@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.harris.rf.bbptt.core.BbPttCore;
@@ -11,7 +13,7 @@ import com.harris.rf.bbptt.core.IBeOnEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
-    native String getNativeString();
+    native void getNativeString();
 
     static {
         System.loadLibrary("mmdvm");
@@ -21,7 +23,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView t = findViewById(R.id.hello);
-        t.setText(getNativeString());
+        Button t = findViewById(R.id.hello);
+        t.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getNativeString();
+            }
+        });
     }
 }

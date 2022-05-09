@@ -27,8 +27,8 @@ add_library(libmutauth SHARED IMPORTED)
 set_target_properties(libmutauth PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libmutauth.so IMPORTED_NO_SONAME 1)
 add_library(libcrypto SHARED IMPORTED)
 set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libcrypto.so)
-add_library(libcpp_shared SHARED IMPORTED)
-set_target_properties(libcpp_shared PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libc++_shared.so)
+#add_library(libcpp_shared SHARED IMPORTED)
+#set_target_properties(libcpp_shared PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libc++_shared.so)
 add_library(libcore SHARED IMPORTED)
 set_target_properties(libcore PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/liblib-core.so)
 
@@ -66,6 +66,8 @@ target_link_libraries( # Specifies the target library.
         # included in the NDK.
         ${log-lib})
 
+find_package(oboe REQUIRED CONFIG)
+
 target_link_libraries(
         mmdvm
         libcore
@@ -73,5 +75,6 @@ target_link_libraries(
         libsecdll
         libmutauth
         libcrypto
-        libcpp_shared
+        oboe::oboe
+ #       libcpp_shared
 )

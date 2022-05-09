@@ -30,7 +30,7 @@ public interface IBeOnVocoder {
         TYPE_AMR_WB(17),
         TYPE_NOT_VALID(255);
         
-        private int value;
+        private final int value;
 
         Type(int i) {
             this.value = i;
