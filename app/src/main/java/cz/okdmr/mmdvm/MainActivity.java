@@ -24,11 +24,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button t = findViewById(R.id.hello);
-        t.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getNativeString();
-            }
-        });
+        t.setOnClickListener(v -> getNativeString());
     }
 }

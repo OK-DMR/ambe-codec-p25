@@ -19,22 +19,8 @@ set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} -Wl,--hash-s
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
-add_library(libssl SHARED IMPORTED)
-set_target_properties(libssl PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libssl.so)
-add_library(libsecdll SHARED IMPORTED)
-set_target_properties(libsecdll PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libsecdll.so IMPORTED_NO_SONAME 1)
-add_library(libmutauth SHARED IMPORTED)
-set_target_properties(libmutauth PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libmutauth.so IMPORTED_NO_SONAME 1)
-add_library(libcrypto SHARED IMPORTED)
-set_target_properties(libcrypto PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libcrypto.so)
-#add_library(libcpp_shared SHARED IMPORTED)
-#set_target_properties(libcpp_shared PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libc++_shared.so)
-#add_library(libvocoder SHARED IMPORTED)
-#set_target_properties(libvocoder PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/libvocoder.so IMPORTED_NO_SONAME 1)
-add_library(libcore SHARED IMPORTED)
-set_target_properties(libcore PROPERTIES IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${ANDROID_ABI}/liblib-core.so)
 
-FILE(GLOB SRCS *.h *.c *.cpp)
+FILE(GLOB SRCS *.h *.c *.cpp *.cc)
 
 add_library( # Sets the name of the library.
         mmdvm
@@ -58,25 +44,10 @@ find_library( # Sets the name of the path variable.
         # you want CMake to locate.
         log)
 
-# Specifies libraries CMake should link to your target library. You
-# can link multiple libraries, such as libraries you define in this
-# build script, prebuilt third-party libraries, or system libraries.
-
-target_link_libraries( # Specifies the target library.
-        mmdvm
-
-        # Links the target library to the log library
-        # included in the NDK.
-        ${log-lib})
-
 find_package(oboe REQUIRED CONFIG)
 
 target_link_libraries(
         mmdvm
-        libcore
-        libssl
-        libsecdll
-        libmutauth
-        libcrypto
         oboe::oboe
+        ${log-lib}
 )
