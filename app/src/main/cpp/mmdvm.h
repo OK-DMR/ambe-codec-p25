@@ -49,13 +49,13 @@ public:
                             "prepareAudio");
         std::lock_guard<std::mutex> lock(mStreamLock);
         oboe::AudioStreamBuilder builder;
-        oboe::Result result = builder.setPerformanceMode(oboe::PerformanceMode::LowLatency)
+        oboe::Result result = builder.setUsage(Usage::VoiceCommunication)
                 ->setDirection(oboe::Direction::Output)
-                ->setSharingMode(oboe::SharingMode::Shared)
+                ->setSharingMode(oboe::SharingMode::Exclusive)
                 ->setFormat(oboe::AudioFormat::I16)
                 ->setChannelCount(oboe::ChannelCount::Mono)
                 ->setSampleRate(8000)
-                ->setSampleRateConversionQuality(SampleRateConversionQuality::Medium)
+                ->setContentType(ContentType::Speech)
                 ->setDataCallback(this)
                 ->openStream(mStream);
 
@@ -70,14 +70,8 @@ public:
     }
 
     void addSamples(short const samples[], uint32_t const amount) {
-        //__android_log_print(ANDROID_LOG_WARN, "OboePlayer::addSamples",
-        //                    "addSamples amount:%d", amount);
         std::lock_guard<std::mutex> lock(mBufferLock);
         for (int i = 0; i < amount; i++) {
-            //if (samples[i] > 0) {
-            //    __android_log_print(ANDROID_LOG_WARN, "OboePlayer::addSamples", "short value %d",
-            //                        samples[i]);
-            //}
             mBuffer.push(samples[i]);
         }
     }
