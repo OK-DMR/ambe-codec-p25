@@ -2,18 +2,109 @@
 
 package cz.okdmr.kaitai.hytera;
 
-import io.kaitai.struct.ByteBufferKaitaiStream;
-import io.kaitai.struct.KaitaiStruct;
-import io.kaitai.struct.KaitaiStream;
 import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.kaitai.struct.ByteBufferKaitaiStream;
+import io.kaitai.struct.KaitaiStream;
+import io.kaitai.struct.KaitaiStruct;
 
 public class RadioControlProtocol extends KaitaiStruct {
+    private ServiceTypes serviceType;
+    private int messageLength;
+    private KaitaiStruct data;
+    private RadioControlProtocol _root;
+    private KaitaiStruct _parent;
+
+    public RadioControlProtocol(KaitaiStream _io) {
+        this(_io, null, null);
+    }
+
+    public RadioControlProtocol(KaitaiStream _io, KaitaiStruct _parent) {
+        this(_io, _parent, null);
+    }
+
+    public RadioControlProtocol(KaitaiStream _io, KaitaiStruct _parent, RadioControlProtocol _root) {
+        super(_io);
+        this._parent = _parent;
+        this._root = _root == null ? this : _root;
+        _read();
+    }
+
     public static RadioControlProtocol fromFile(String fileName) throws IOException {
         return new RadioControlProtocol(new ByteBufferKaitaiStream(fileName));
+    }
+
+    private void _read() {
+        this.serviceType = ServiceTypes.byId(this._io.readU2le());
+        this.messageLength = this._io.readU2le();
+        {
+            ServiceTypes on = serviceType();
+            if (on != null) {
+                switch (serviceType()) {
+                    case CALL_REPLY: {
+                        this.data = new CallReply(this._io, this, _root);
+                        break;
+                    }
+                    case RADIO_IDENTIFICATION_REPLY: {
+                        this.data = new RadioIdentificationReply(this._io, this, _root);
+                        break;
+                    }
+                    case BROADCAST_STATUS_CONFIGURATION_REQUEST: {
+                        this.data = new BroadcastStatusConfigurationRequest(this._io, this, _root);
+                        break;
+                    }
+                    case CALL_REQUEST: {
+                        this.data = new CallRequest(this._io, this, _root);
+                        break;
+                    }
+                    case REMOVE_RADIO_REQUEST: {
+                        this.data = new RemoveRadioRequest(this._io, this, _root);
+                        break;
+                    }
+                    case BROADCAST_STATUS_CONFIGURATION_REPLY: {
+                        this.data = new BroadcastStatusConfigurationReply(this._io, this, _root);
+                        break;
+                    }
+                    case REMOVE_RADIO_REPLY: {
+                        this.data = new RemoveRadioReply(this._io, this, _root);
+                        break;
+                    }
+                    default: {
+                        this.data = new GenericData(this._io, this, _root);
+                        break;
+                    }
+                }
+            } else {
+                this.data = new GenericData(this._io, this, _root);
+            }
+        }
+    }
+
+    public ServiceTypes serviceType() {
+        return serviceType;
+    }
+
+    /**
+     * length of the message from next field to the end of RCP message
+     */
+    public int messageLength() {
+        return messageLength;
+    }
+
+    public KaitaiStruct data() {
+        return data;
+    }
+
+    public RadioControlProtocol _root() {
+        return _root;
+    }
+
+    public KaitaiStruct _parent() {
+        return _parent;
     }
 
     public enum ServiceTypes {
@@ -78,15 +169,26 @@ public class RadioControlProtocol extends KaitaiStruct {
         REPEATER_BROADCAST_TRANSMIT_STATUS(47173),
         BROADCAST_RECEIVE_STATUS(47428);
 
-        private final long id;
-        ServiceTypes(long id) { this.id = id; }
-        public long id() { return id; }
         private static final Map<Long, ServiceTypes> byId = new HashMap<Long, ServiceTypes>(60);
+
         static {
             for (ServiceTypes e : ServiceTypes.values())
                 byId.put(e.id(), e);
         }
-        public static ServiceTypes byId(long id) { return byId.get(id); }
+
+        private final long id;
+
+        ServiceTypes(long id) {
+            this.id = id;
+        }
+
+        public static ServiceTypes byId(long id) {
+            return byId.get(id);
+        }
+
+        public long id() {
+            return id;
+        }
     }
 
     public enum CallTypes {
@@ -100,95 +202,58 @@ public class RadioControlProtocol extends KaitaiStruct {
         PRIORITY_GROUP_CALL(7),
         PRIORITY_ALL_CALL(8);
 
-        private final long id;
-        CallTypes(long id) { this.id = id; }
-        public long id() { return id; }
         private static final Map<Long, CallTypes> byId = new HashMap<Long, CallTypes>(9);
+
         static {
             for (CallTypes e : CallTypes.values())
                 byId.put(e.id(), e);
         }
-        public static CallTypes byId(long id) { return byId.get(id); }
+
+        private final long id;
+
+        CallTypes(long id) {
+            this.id = id;
+        }
+
+        public static CallTypes byId(long id) {
+            return byId.get(id);
+        }
+
+        public long id() {
+            return id;
+        }
     }
 
     public enum ReplyResults {
         SUCCESS(0),
         FAILURE(1);
 
-        private final long id;
-        ReplyResults(long id) { this.id = id; }
-        public long id() { return id; }
         private static final Map<Long, ReplyResults> byId = new HashMap<Long, ReplyResults>(2);
+
         static {
             for (ReplyResults e : ReplyResults.values())
                 byId.put(e.id(), e);
         }
-        public static ReplyResults byId(long id) { return byId.get(id); }
-    }
 
-    public RadioControlProtocol(KaitaiStream _io) {
-        this(_io, null, null);
-    }
+        private final long id;
 
-    public RadioControlProtocol(KaitaiStream _io, KaitaiStruct _parent) {
-        this(_io, _parent, null);
-    }
+        ReplyResults(long id) {
+            this.id = id;
+        }
 
-    public RadioControlProtocol(KaitaiStream _io, KaitaiStruct _parent, RadioControlProtocol _root) {
-        super(_io);
-        this._parent = _parent;
-        this._root = _root == null ? this : _root;
-        _read();
-    }
-    private void _read() {
-        this.serviceType = ServiceTypes.byId(this._io.readU2le());
-        this.messageLength = this._io.readU2le();
-        {
-            ServiceTypes on = serviceType();
-            if (on != null) {
-                switch (serviceType()) {
-                case CALL_REPLY: {
-                    this.data = new CallReply(this._io, this, _root);
-                    break;
-                }
-                case RADIO_IDENTIFICATION_REPLY: {
-                    this.data = new RadioIdentificationReply(this._io, this, _root);
-                    break;
-                }
-                case BROADCAST_STATUS_CONFIGURATION_REQUEST: {
-                    this.data = new BroadcastStatusConfigurationRequest(this._io, this, _root);
-                    break;
-                }
-                case CALL_REQUEST: {
-                    this.data = new CallRequest(this._io, this, _root);
-                    break;
-                }
-                case REMOVE_RADIO_REQUEST: {
-                    this.data = new RemoveRadioRequest(this._io, this, _root);
-                    break;
-                }
-                case BROADCAST_STATUS_CONFIGURATION_REPLY: {
-                    this.data = new BroadcastStatusConfigurationReply(this._io, this, _root);
-                    break;
-                }
-                case REMOVE_RADIO_REPLY: {
-                    this.data = new RemoveRadioReply(this._io, this, _root);
-                    break;
-                }
-                default: {
-                    this.data = new GenericData(this._io, this, _root);
-                    break;
-                }
-                }
-            } else {
-                this.data = new GenericData(this._io, this, _root);
-            }
+        public static ReplyResults byId(long id) {
+            return byId.get(id);
+        }
+
+        public long id() {
+            return id;
         }
     }
+
     public static class BroadcastStatusConfigurationReply extends KaitaiStruct {
-        public static BroadcastStatusConfigurationReply fromFile(String fileName) throws IOException {
-            return new BroadcastStatusConfigurationReply(new ByteBufferKaitaiStream(fileName));
-        }
+        private ReplyResults result;
+        private RadioControlProtocol _root;
+        private RadioControlProtocol _parent;
 
         public BroadcastStatusConfigurationReply(KaitaiStream _io) {
             this(_io, null, null);
@@ -204,20 +269,33 @@ public class RadioControlProtocol extends KaitaiStruct {
             this._root = _root;
             _read();
         }
+
+        public static BroadcastStatusConfigurationReply fromFile(String fileName) throws IOException {
+            return new BroadcastStatusConfigurationReply(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.result = RadioControlProtocol.ReplyResults.byId(this._io.readU1());
         }
-        private ReplyResults result;
-        private RadioControlProtocol _root;
-        private RadioControlProtocol _parent;
-        public ReplyResults result() { return result; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    public static class BroadcastConfiguration extends KaitaiStruct {
-        public static BroadcastConfiguration fromFile(String fileName) throws IOException {
-            return new BroadcastConfiguration(new ByteBufferKaitaiStream(fileName));
+
+        public ReplyResults result() {
+            return result;
         }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
+
+    public static class BroadcastConfiguration extends KaitaiStruct {
+        private int configOperation;
+        private int configTarget;
+        private RadioControlProtocol _root;
+        private RadioControlProtocol.BroadcastStatusConfigurationRequest _parent;
 
         public BroadcastConfiguration(KaitaiStream _io) {
             this(_io, null, null);
@@ -226,42 +304,53 @@ public class RadioControlProtocol extends KaitaiStruct {
         public BroadcastConfiguration(KaitaiStream _io, RadioControlProtocol.BroadcastStatusConfigurationRequest _parent) {
             this(_io, _parent, null);
         }
-
         public BroadcastConfiguration(KaitaiStream _io, RadioControlProtocol.BroadcastStatusConfigurationRequest _parent, RadioControlProtocol _root) {
             super(_io);
             this._parent = _parent;
             this._root = _root;
             _read();
         }
+
+        public static BroadcastConfiguration fromFile(String fileName) throws IOException {
+            return new BroadcastConfiguration(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.configOperation = this._io.readU1();
             this.configTarget = this._io.readU1();
         }
-        private int configOperation;
-        private int configTarget;
-        private RadioControlProtocol _root;
-        private RadioControlProtocol.BroadcastStatusConfigurationRequest _parent;
 
         /**
          * 0x00 => notifications off 0x01 => notifications on
          */
-        public int configOperation() { return configOperation; }
+        public int configOperation() {
+            return configOperation;
+        }
 
         /**
          * 0x00 => broadcast transmit status, 0x01 => broadcast receive status, 0x02 => repeater broadcast transmit status
          */
-        public int configTarget() { return configTarget; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol.BroadcastStatusConfigurationRequest _parent() { return _parent; }
+        public int configTarget() {
+            return configTarget;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol.BroadcastStatusConfigurationRequest _parent() {
+            return _parent;
+        }
     }
 
     /**
      * This message is used to enable/disable broadcast transmit/receive status reporting to RCP Application.
      */
     public static class BroadcastStatusConfigurationRequest extends KaitaiStruct {
-        public static BroadcastStatusConfigurationRequest fromFile(String fileName) throws IOException {
-            return new BroadcastStatusConfigurationRequest(new ByteBufferKaitaiStream(fileName));
-        }
+        private int numBroadcastConfiguration;
+        private ArrayList<BroadcastConfiguration> broadcastConfiguration;
+        private RadioControlProtocol _root;
+        private RadioControlProtocol _parent;
 
         public BroadcastStatusConfigurationRequest(KaitaiStream _io) {
             this(_io, null, null);
@@ -270,13 +359,17 @@ public class RadioControlProtocol extends KaitaiStruct {
         public BroadcastStatusConfigurationRequest(KaitaiStream _io, RadioControlProtocol _parent) {
             this(_io, _parent, null);
         }
-
         public BroadcastStatusConfigurationRequest(KaitaiStream _io, RadioControlProtocol _parent, RadioControlProtocol _root) {
             super(_io);
             this._parent = _parent;
             this._root = _root;
             _read();
         }
+
+        public static BroadcastStatusConfigurationRequest fromFile(String fileName) throws IOException {
+            return new BroadcastStatusConfigurationRequest(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.numBroadcastConfiguration = this._io.readU1();
             this.broadcastConfiguration = new ArrayList<BroadcastConfiguration>();
@@ -284,34 +377,48 @@ public class RadioControlProtocol extends KaitaiStruct {
                 this.broadcastConfiguration.add(new BroadcastConfiguration(this._io, this, _root));
             }
         }
-        private int numBroadcastConfiguration;
-        private ArrayList<BroadcastConfiguration> broadcastConfiguration;
+
+        public int numBroadcastConfiguration() {
+            return numBroadcastConfiguration;
+        }
+
+        public ArrayList<BroadcastConfiguration> broadcastConfiguration() {
+            return broadcastConfiguration;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
+
+    public static class RadioIdentificationReply extends KaitaiStruct {
+        private byte[] header;
+        private String text;
+        private byte[] footer;
         private RadioControlProtocol _root;
         private RadioControlProtocol _parent;
-        public int numBroadcastConfiguration() { return numBroadcastConfiguration; }
-        public ArrayList<BroadcastConfiguration> broadcastConfiguration() { return broadcastConfiguration; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    public static class RadioIdentificationReply extends KaitaiStruct {
-        public static RadioIdentificationReply fromFile(String fileName) throws IOException {
-            return new RadioIdentificationReply(new ByteBufferKaitaiStream(fileName));
-        }
 
         public RadioIdentificationReply(KaitaiStream _io) {
             this(_io, null, null);
         }
-
         public RadioIdentificationReply(KaitaiStream _io, RadioControlProtocol _parent) {
             this(_io, _parent, null);
         }
-
         public RadioIdentificationReply(KaitaiStream _io, RadioControlProtocol _parent, RadioControlProtocol _root) {
             super(_io);
             this._parent = _parent;
             this._root = _root;
             _read();
         }
+
+        public static RadioIdentificationReply fromFile(String fileName) throws IOException {
+            return new RadioIdentificationReply(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             if (_parent().messageLength() >= 6) {
                 this.header = this._io.readBytes(6);
@@ -323,21 +430,32 @@ public class RadioControlProtocol extends KaitaiStruct {
                 this.footer = this._io.readBytes(8);
             }
         }
-        private byte[] header;
-        private String text;
-        private byte[] footer;
+
+        public byte[] header() {
+            return header;
+        }
+
+        public String text() {
+            return text;
+        }
+
+        public byte[] footer() {
+            return footer;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
+
+    public static class GenericData extends KaitaiStruct {
+        private byte[] data;
         private RadioControlProtocol _root;
         private RadioControlProtocol _parent;
-        public byte[] header() { return header; }
-        public String text() { return text; }
-        public byte[] footer() { return footer; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    public static class GenericData extends KaitaiStruct {
-        public static GenericData fromFile(String fileName) throws IOException {
-            return new GenericData(new ByteBufferKaitaiStream(fileName));
-        }
 
         public GenericData(KaitaiStream _io) {
             this(_io, null, null);
@@ -353,20 +471,33 @@ public class RadioControlProtocol extends KaitaiStruct {
             this._root = _root;
             _read();
         }
+
+        public static GenericData fromFile(String fileName) throws IOException {
+            return new GenericData(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.data = this._io.readBytes(_parent().messageLength());
         }
-        private byte[] data;
+
+        public byte[] data() {
+            return data;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
+
+    public static class CallRequest extends KaitaiStruct {
+        private CallTypes callType;
+        private long targetId;
         private RadioControlProtocol _root;
         private RadioControlProtocol _parent;
-        public byte[] data() { return data; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    public static class CallRequest extends KaitaiStruct {
-        public static CallRequest fromFile(String fileName) throws IOException {
-            return new CallRequest(new ByteBufferKaitaiStream(fileName));
-        }
 
         public CallRequest(KaitaiStream _io) {
             this(_io, null, null);
@@ -375,38 +506,49 @@ public class RadioControlProtocol extends KaitaiStruct {
         public CallRequest(KaitaiStream _io, RadioControlProtocol _parent) {
             this(_io, _parent, null);
         }
-
         public CallRequest(KaitaiStream _io, RadioControlProtocol _parent, RadioControlProtocol _root) {
             super(_io);
             this._parent = _parent;
             this._root = _root;
             _read();
         }
+
+        public static CallRequest fromFile(String fileName) throws IOException {
+            return new CallRequest(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.callType = RadioControlProtocol.CallTypes.byId(this._io.readU1());
             this.targetId = this._io.readU4le();
         }
-        private CallTypes callType;
-        private long targetId;
-        private RadioControlProtocol _root;
-        private RadioControlProtocol _parent;
-        public CallTypes callType() { return callType; }
+
+        public CallTypes callType() {
+            return callType;
+        }
 
         /**
          * ignored for all_call
          */
-        public long targetId() { return targetId; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
+        public long targetId() {
+            return targetId;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
     }
 
     /**
      * Response from Dispatch Station
      */
     public static class RemoveRadioReply extends KaitaiStruct {
-        public static RemoveRadioReply fromFile(String fileName) throws IOException {
-            return new RemoveRadioReply(new ByteBufferKaitaiStream(fileName));
-        }
+        private ReplyResults result;
+        private RadioControlProtocol _root;
+        private RadioControlProtocol _parent;
 
         public RemoveRadioReply(KaitaiStream _io) {
             this(_io, null, null);
@@ -422,15 +564,26 @@ public class RadioControlProtocol extends KaitaiStruct {
             this._root = _root;
             _read();
         }
+
+        public static RemoveRadioReply fromFile(String fileName) throws IOException {
+            return new RemoveRadioReply(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.result = RadioControlProtocol.ReplyResults.byId(this._io.readU1());
         }
-        private ReplyResults result;
-        private RadioControlProtocol _root;
-        private RadioControlProtocol _parent;
-        public ReplyResults result() { return result; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
+
+        public ReplyResults result() {
+            return result;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
     }
 
     /**
@@ -438,9 +591,8 @@ public class RadioControlProtocol extends KaitaiStruct {
      * If there is no call target, this request will do nothing.
      */
     public static class RemoveRadioRequest extends KaitaiStruct {
-        public static RemoveRadioRequest fromFile(String fileName) throws IOException {
-            return new RemoveRadioRequest(new ByteBufferKaitaiStream(fileName));
-        }
+        private RadioControlProtocol _root;
+        private RadioControlProtocol _parent;
 
         public RemoveRadioRequest(KaitaiStream _io) {
             this(_io, null, null);
@@ -456,17 +608,27 @@ public class RadioControlProtocol extends KaitaiStruct {
             this._root = _root;
             _read();
         }
+
+        public static RemoveRadioRequest fromFile(String fileName) throws IOException {
+            return new RemoveRadioRequest(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
         }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
+
+    public static class CallReply extends KaitaiStruct {
+        private ReplyResults result;
         private RadioControlProtocol _root;
         private RadioControlProtocol _parent;
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    public static class CallReply extends KaitaiStruct {
-        public static CallReply fromFile(String fileName) throws IOException {
-            return new CallReply(new ByteBufferKaitaiStream(fileName));
-        }
 
         public CallReply(KaitaiStream _io) {
             this(_io, null, null);
@@ -482,28 +644,25 @@ public class RadioControlProtocol extends KaitaiStruct {
             this._root = _root;
             _read();
         }
+
+        public static CallReply fromFile(String fileName) throws IOException {
+            return new CallReply(new ByteBufferKaitaiStream(fileName));
+        }
+
         private void _read() {
             this.result = RadioControlProtocol.ReplyResults.byId(this._io.readU1());
         }
-        private ReplyResults result;
-        private RadioControlProtocol _root;
-        private RadioControlProtocol _parent;
-        public ReplyResults result() { return result; }
-        public RadioControlProtocol _root() { return _root; }
-        public RadioControlProtocol _parent() { return _parent; }
-    }
-    private ServiceTypes serviceType;
-    private int messageLength;
-    private KaitaiStruct data;
-    private RadioControlProtocol _root;
-    private KaitaiStruct _parent;
-    public ServiceTypes serviceType() { return serviceType; }
 
-    /**
-     * length of the message from next field to the end of RCP message
-     */
-    public int messageLength() { return messageLength; }
-    public KaitaiStruct data() { return data; }
-    public RadioControlProtocol _root() { return _root; }
-    public KaitaiStruct _parent() { return _parent; }
+        public ReplyResults result() {
+            return result;
+        }
+
+        public RadioControlProtocol _root() {
+            return _root;
+        }
+
+        public RadioControlProtocol _parent() {
+            return _parent;
+        }
+    }
 }

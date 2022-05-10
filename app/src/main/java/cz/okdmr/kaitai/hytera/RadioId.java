@@ -2,19 +2,21 @@
 
 package cz.okdmr.kaitai.hytera;
 
-import io.kaitai.struct.ByteBufferKaitaiStream;
-import io.kaitai.struct.KaitaiStruct;
-import io.kaitai.struct.KaitaiStream;
 import java.io.IOException;
+
+import io.kaitai.struct.ByteBufferKaitaiStream;
+import io.kaitai.struct.KaitaiStream;
+import io.kaitai.struct.KaitaiStruct;
 
 
 /**
  * represented as 3 bytes, each byte interpreted as number (0-255)
  */
 public class RadioId extends KaitaiStruct {
-    public static RadioId fromFile(String fileName) throws IOException {
-        return new RadioId(new ByteBufferKaitaiStream(fileName));
-    }
+    private Integer radioId;
+    private long radioIdRaw;
+    private RadioId _root;
+    private KaitaiStruct _parent;
 
     public RadioId(KaitaiStream _io) {
         this(_io, null, null);
@@ -30,10 +32,15 @@ public class RadioId extends KaitaiStruct {
         this._root = _root == null ? this : _root;
         _read();
     }
+
+    public static RadioId fromFile(String fileName) throws IOException {
+        return new RadioId(new ByteBufferKaitaiStream(fileName));
+    }
+
     private void _read() {
         this.radioIdRaw = this._io.readU4le();
     }
-    private Integer radioId;
+
     public Integer radioId() {
         if (this.radioId != null)
             return this.radioId;
@@ -41,10 +48,16 @@ public class RadioId extends KaitaiStruct {
         this.radioId = _tmp;
         return this.radioId;
     }
-    private long radioIdRaw;
-    private RadioId _root;
-    private KaitaiStruct _parent;
-    public long radioIdRaw() { return radioIdRaw; }
-    public RadioId _root() { return _root; }
-    public KaitaiStruct _parent() { return _parent; }
+
+    public long radioIdRaw() {
+        return radioIdRaw;
+    }
+
+    public RadioId _root() {
+        return _root;
+    }
+
+    public KaitaiStruct _parent() {
+        return _parent;
+    }
 }

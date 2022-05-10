@@ -32,6 +32,7 @@ public class MmdvmService extends Service {
         return null;
     }
 
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (ACTION_STOP_MMDVM_SERVICE.equalsIgnoreCase(intent.getAction())) {

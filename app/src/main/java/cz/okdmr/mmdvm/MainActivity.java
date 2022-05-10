@@ -2,10 +2,14 @@ package cz.okdmr.mmdvm;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static String LOG_TAG = "MmdvmMain";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,5 +21,20 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.service_stop).setOnClickListener(v -> {
             startService((new Intent(this, MmdvmService.class)).setAction(MmdvmService.ACTION_STOP_MMDVM_SERVICE));
         });
+        checkAccessibilityPermission();
+    }
+
+    public void checkAccessibilityPermission() {
+        int accessEnabled = 0;
+        try {
+            accessEnabled = Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED);
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e(LOG_TAG, "cannot query ACCESSIBILITY_ENABLED", e);
+        }
+        if (accessEnabled == 0) {
+            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
 }

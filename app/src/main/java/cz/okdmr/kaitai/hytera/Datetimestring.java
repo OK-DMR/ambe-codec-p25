@@ -2,20 +2,21 @@
 
 package cz.okdmr.kaitai.hytera;
 
-import io.kaitai.struct.ByteBufferKaitaiStream;
-import io.kaitai.struct.KaitaiStruct;
-import io.kaitai.struct.KaitaiStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
+import io.kaitai.struct.ByteBufferKaitaiStream;
+import io.kaitai.struct.KaitaiStream;
+import io.kaitai.struct.KaitaiStruct;
 
 
 /**
  * time in format yyyyMMddhhmmss, timezone GMT
  */
 public class Datetimestring extends KaitaiStruct {
-    public static Datetimestring fromFile(String fileName) throws IOException {
-        return new Datetimestring(new ByteBufferKaitaiStream(fileName));
-    }
+    private String datetime;
+    private Datetimestring _root;
+    private KaitaiStruct _parent;
 
     public Datetimestring(KaitaiStream _io) {
         this(_io, null, null);
@@ -31,13 +32,24 @@ public class Datetimestring extends KaitaiStruct {
         this._root = _root == null ? this : _root;
         _read();
     }
+
+    public static Datetimestring fromFile(String fileName) throws IOException {
+        return new Datetimestring(new ByteBufferKaitaiStream(fileName));
+    }
+
     private void _read() {
         this.datetime = new String(this._io.readBytes(14), Charset.forName("UTF-8"));
     }
-    private String datetime;
-    private Datetimestring _root;
-    private KaitaiStruct _parent;
-    public String datetime() { return datetime; }
-    public Datetimestring _root() { return _root; }
-    public KaitaiStruct _parent() { return _parent; }
+
+    public String datetime() {
+        return datetime;
+    }
+
+    public Datetimestring _root() {
+        return _root;
+    }
+
+    public KaitaiStruct _parent() {
+        return _parent;
+    }
 }
