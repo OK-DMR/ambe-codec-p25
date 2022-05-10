@@ -1,23 +1,21 @@
 package cz.okdmr.mmdvm;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    native void getNativeString();
-
-    static {
-        System.loadLibrary("mmdvm");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button t = findViewById(R.id.hello);
-        t.setOnClickListener(v -> getNativeString());
+        findViewById(R.id.service_start).setOnClickListener(v -> {
+            startService(new Intent(this, MmdvmService.class));
+        });
+        findViewById(R.id.service_stop).setOnClickListener(v -> {
+            startService((new Intent(this, MmdvmService.class)).setAction(MmdvmService.ACTION_STOP_MMDVM_SERVICE));
+        });
     }
 }
