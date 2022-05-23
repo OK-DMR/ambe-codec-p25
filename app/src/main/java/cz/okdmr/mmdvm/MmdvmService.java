@@ -48,7 +48,7 @@ public class MmdvmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (ACTION_STOP_MMDVM_SERVICE.equalsIgnoreCase(intent.getAction())) {
+        if (intent != null && ACTION_STOP_MMDVM_SERVICE.equalsIgnoreCase(intent.getAction())) {
             registerBroadcasts(false);
             stopForeground(true);
             stopSelf();

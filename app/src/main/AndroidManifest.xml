@@ -27,6 +27,11 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ContactsActivity"
+            android:exported="false"/>
+        <activity android:name=".ContactDetailActivity"
+            android:exported="false"/>
+
         <service
             android:name=".MmdvmService"
             android:exported="false"
