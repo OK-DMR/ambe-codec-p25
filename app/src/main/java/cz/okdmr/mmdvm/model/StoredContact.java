@@ -20,10 +20,8 @@ public class StoredContact {
 
     @Nullable
     public static StoredContact deserialize(int storage_id, String serialized) {
-        Log.d("StoredContact", "deserialize called with data: " + serialized);
         String[] parts = (serialized == null ? "" : serialized).split("\\|");
         if (serialized == null || parts.length < 4) {
-            Log.e("StoredContact", "return null from deserialize in " + serialized + " parts: " + parts.length);
             return null;
         }
         return new StoredContact() {{

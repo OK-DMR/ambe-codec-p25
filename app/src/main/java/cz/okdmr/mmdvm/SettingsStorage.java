@@ -7,6 +7,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import cz.okdmr.mmdvm.model.StoredContact;
 
@@ -40,8 +41,21 @@ public class SettingsStorage {
     }
 
     @Nullable
+    public StoredContact getContactByDmrId(int dmr_id) {
+        String prefix = dmr_id + "|";
+        for(String key: mSettings.getAll().keySet()) {
+            if (key.startsWith(PREFIX_CONTACTS)) {
+                String val = mSettings.getString(key, "");
+                if (val.startsWith(prefix)) {
+                    return StoredContact.deserialize(Integer.parseInt(key.replace(PREFIX_CONTACTS, "")), val);
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     public StoredContact getContact(int id) {
-        Log.d("SettingsStorage", "getContact " + id);
         if (id < 0) {
             return new StoredContact();
         }
@@ -59,7 +73,6 @@ public class SettingsStorage {
     }
 
     public StoredContact storeContact(StoredContact contact) {
-        Log.d("SettingsStorage", "storeContact " + contact._id);
         if (contact._id < 0) {
             contact._id = getNextFreeStorageIndex(PREFIX_CONTACTS);
         }
@@ -72,7 +85,6 @@ public class SettingsStorage {
         while (mSettings.getString(storage_prefix + index, null) != null) {
             index++;
         }
-        Log.d("SettingsStorage", "getNextFreeStorageIndex prefix: " + storage_prefix + ", index: " + index);
         return index;
     }
 

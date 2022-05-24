@@ -50,9 +50,11 @@ public class ContactsAdapter extends BaseAdapter {
 
         TextView tv = convertView.findViewById(R.id.list_item_text);
         ImageView iv = convertView.findViewById(R.id.list_item_image);
+        TextView sub = convertView.findViewById(R.id.list_item_subtitle);
         if (sc != null) {
             tv.setText(String.format(Locale.US, "%d - %s", sc.dmr_id, sc.dmr_callsign));
             iv.setImageResource(sc.is_private ? R.drawable.ic_baseline_person_24 : R.drawable.ic_baseline_group_24);
+            sub.setText(sc.display_name);
         }
 
         return convertView;

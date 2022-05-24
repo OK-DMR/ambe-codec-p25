@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.service_stop).setOnClickListener(v -> {
             startService((new Intent(this, MmdvmService.class)).setAction(MmdvmService.ACTION_STOP_MMDVM_SERVICE));
         });
-        startService(new Intent(this, MmdvmService.class));
+        //startService(new Intent(this, MmdvmService.class));
         //checkAccessibilityPermission();
-        checkGPSPermission();
+        checkPermissions();
     }
 
     public void checkAccessibilityPermission() {
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void checkGPSPermission() {
+    public void checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -64,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(this, "Selected id " + item.getItemId(), Toast.LENGTH_SHORT).show();
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case 1:
                 startActivity(new Intent(MainActivity.this, ContactsActivity.class));
                 return true;
@@ -79,10 +77,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem o = menu.add(0,2,1,"Nastavení");
+        MenuItem o = menu.add(0, 2, 1, "Nastavení");
         o.setIcon(R.drawable.ic_baseline_settings_24);
         o.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        MenuItem i = menu.add(0,1,2,"Kontakty");
+        MenuItem i = menu.add(0, 1, 2, "Kontakty");
         i.setIcon(R.drawable.ic_baseline_group_24);
         i.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
