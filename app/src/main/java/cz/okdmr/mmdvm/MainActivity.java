@@ -66,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem i = menu.add(0,1,0,"Kontakty");
-        i.setIcon(android.R.drawable.sym_contact_card);
+        i.setIcon(R.drawable.ic_baseline_group_24);
         i.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         MenuItem o = menu.add(0,2,0,"Servery");
-        o.setIcon(android.R.drawable.btn_star);
+        o.setIcon(R.drawable.ic_baseline_storage_24);
         o.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         MenuItem s = menu.add(0,3,0,"Identity");
-        s.setIcon(android.R.drawable.ic_lock_lock);
+        s.setIcon(R.drawable.ic_identity_platform_48);
         s.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
     }

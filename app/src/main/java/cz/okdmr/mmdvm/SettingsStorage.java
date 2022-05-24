@@ -2,8 +2,11 @@ package cz.okdmr.mmdvm;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
 
 import cz.okdmr.mmdvm.model.StoredContact;
 
@@ -33,18 +36,29 @@ public class SettingsStorage {
 
     @Nullable
     public StoredContact getContact(int id) {
+        Log.d("SettingsStorage", "getContact " + id);
         if (id < 0) {
             return new StoredContact();
         }
         String serializedContact = mSettings.getString(PREFIX_CONTACTS + id, null);
-        return StoredContact.deserialize(id, serializedContact);
+        StoredContact sc = StoredContact.deserialize(id, serializedContact);
+        if (sc == null) {
+            deleteContact(new StoredContact() {{
+                _id = id;
+            }});
+        } else {
+            // set id into the record
+            sc._id = id;
+        }
+        return sc;
     }
 
     public StoredContact storeContact(StoredContact contact) {
-        if (contact._id == null) {
+        Log.d("SettingsStorage", "storeContact " + contact._id);
+        if (contact._id < 0) {
             contact._id = getNextFreeStorageIndex(PREFIX_CONTACTS);
         }
-        mSettings.edit().putString(PREFIX_CONTACTS+contact._id, contact.serialize()).apply();
+        mSettings.edit().putString(PREFIX_CONTACTS + contact._id, contact.serialize()).apply();
         return contact;
     }
 
@@ -53,7 +67,24 @@ public class SettingsStorage {
         while (mSettings.getString(storage_prefix + index, null) != null) {
             index++;
         }
+        Log.d("SettingsStorage", "getNextFreeStorageIndex prefix: " + storage_prefix + ", index: " + index);
         return index;
     }
 
+    public boolean deleteContact(StoredContact contact) {
+        if (contact._id >= 0) {
+            return mSettings.edit().remove(PREFIX_CONTACTS + contact._id).commit();
+        }
+        return false;
+    }
+
+    public ArrayList<Integer> getIds(String storage_prefix) {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (String key : mSettings.getAll().keySet()) {
+            if (key.startsWith(PREFIX_CONTACTS)) {
+                ids.add(Integer.parseInt(key.replace(PREFIX_CONTACTS, "")));
+            }
+        }
+        return ids;
+    }
 }

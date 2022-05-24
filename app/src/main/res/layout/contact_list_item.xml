@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10sp"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/list_item_image"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:paddingEnd="10sp"
+        android:paddingStart="10sp"
+        android:src="@drawable/ic_baseline_group_24"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/list_item_text"
+        android:textSize="25sp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
