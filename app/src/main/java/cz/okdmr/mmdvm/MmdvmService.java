@@ -25,6 +25,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import cz.okdmr.mmdvm.homebrew.MMDVMClient;
+
 public class MmdvmService extends Service {
     public static String NOTIFICATION_CHANNEL_GROUP_ID = "mmdvm";
     public static String NOTIFICATION_CHANNEL_GROUP_NAME = "MMDVM";
@@ -47,6 +49,7 @@ public class MmdvmService extends Service {
     private KeyguardManager mKeyguardManager;
     private KeyguardManager.KeyguardLock mKeyguardLock;
     private LocationManager mLocationManager;
+    private MMDVMClient mMmdvmClient;
 
     @Nullable
     @Override
@@ -59,13 +62,15 @@ public class MmdvmService extends Service {
         if (intent != null && ACTION_STOP_MMDVM_SERVICE.equalsIgnoreCase(intent.getAction())) {
             registerBroadcasts(false);
             stopForeground(true);
-            setupGPS(false);
+            //setupGPS(false);
+            setupMmdvmClient(false);
             stopSelf();
         } else {
             showForegroundNotification();
             registerBroadcasts(true);
             setupWakeLock(false);
-            setupGPS(true);
+            //setupGPS(true);
+            setupMmdvmClient(true);
         }
         return START_STICKY;
     }
@@ -182,6 +187,16 @@ public class MmdvmService extends Service {
         } else if (locationsRegistered){
             mLocationManager.removeUpdates(mLocationListener);
             locationsRegistered = false;
+        }
+    }
+
+    private void setupMmdvmClient(boolean enable) {
+        if (mMmdvmClient == null) {
+            mMmdvmClient = new MMDVMClient();
+        }
+        mMmdvmClient.connect(enable);
+        if (enable) {
+            mMmdvmClient.start();
         }
     }
 }
