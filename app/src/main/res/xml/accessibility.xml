@@ -7,4 +7,4 @@
     android:canRetrieveWindowContent="true"
     android:notificationTimeout="100"
     android:packageNames="cz.okdmr.mmdvm"
-    android:settingsActivity="" />
+    android:settingsActivity="cz.okdmr.mmdvm.MainActivity" />

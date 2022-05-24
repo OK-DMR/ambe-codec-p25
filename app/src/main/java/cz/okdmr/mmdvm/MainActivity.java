@@ -1,6 +1,8 @@
 package cz.okdmr.mmdvm;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,12 +35,13 @@ public class MainActivity extends AppCompatActivity {
         });
         startService(new Intent(this, MmdvmService.class));
         //checkAccessibilityPermission();
+        checkGPSPermission();
     }
 
     public void checkAccessibilityPermission() {
         int accessEnabled = 0;
         try {
-            accessEnabled = Settings.Secure.getInt(this.getContentResolver(), Settings.Secure.ACCESSIBILITY_ENABLED);
+            accessEnabled = Settings.Secure.getInt(this.getContentResolver(), "accessibility_enabled");
         } catch (Throwable e) {
             Log.e(LOG_TAG, "cannot query ACCESSIBILITY_ENABLED", e);
         }
@@ -45,6 +49,16 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+        }
+    }
+
+    public void checkGPSPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.RECORD_AUDIO
+            }, 0);
         }
     }
 

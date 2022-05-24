@@ -1,5 +1,6 @@
 package cz.okdmr.mmdvm;
 
+import android.Manifest;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -10,11 +11,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.OnNmeaMessageListener;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 public class MmdvmService extends Service {
@@ -38,6 +46,7 @@ public class MmdvmService extends Service {
     private PowerManager.WakeLock mWakeLock;
     private KeyguardManager mKeyguardManager;
     private KeyguardManager.KeyguardLock mKeyguardLock;
+    private LocationManager mLocationManager;
 
     @Nullable
     @Override
@@ -45,17 +54,18 @@ public class MmdvmService extends Service {
         return null;
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && ACTION_STOP_MMDVM_SERVICE.equalsIgnoreCase(intent.getAction())) {
             registerBroadcasts(false);
             stopForeground(true);
+            setupGPS(false);
             stopSelf();
         } else {
             showForegroundNotification();
             registerBroadcasts(true);
             setupWakeLock(false);
+            setupGPS(true);
         }
         return START_STICKY;
     }
@@ -136,5 +146,42 @@ public class MmdvmService extends Service {
             mNotification = notificationBuilder.build();
         }
         startForeground(FOREGROUND_NOTIFICATION_ID, mNotification);
+    }
+
+    private boolean locationsRegistered = false;
+    private LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            Log.e("onLocationChanged", location.toString());
+        }
+    };
+
+    private void setupGPS(boolean enable) {
+        if (mLocationManager == null) {
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        if (enable && !locationsRegistered) {
+            mLocationManager.addNmeaListener(new OnNmeaMessageListener() {
+                @Override
+                public void onNmeaMessage(String message, long timestamp) {
+                    Log.e("onNmeaMessage", message);
+                }
+            });
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5 * 1000, 0, mLocationListener);
+            locationsRegistered = true;
+        } else if (locationsRegistered){
+            mLocationManager.removeUpdates(mLocationListener);
+            locationsRegistered = false;
+        }
     }
 }

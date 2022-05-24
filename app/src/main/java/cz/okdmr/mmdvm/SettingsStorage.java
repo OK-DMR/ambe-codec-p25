@@ -18,6 +18,11 @@ public class SettingsStorage {
     public static String PREFIX_IDENTITIES = "_i-";
     public static String PREFIX_CONTACTS = "_c-";
 
+    public static String ALLOW_ACCESSIBILITY = "app.allow_accessibility";
+    public static String CONNECT_AUTOMATICALLY = "app.connect_automatically";
+
+    public static String KEY_GPS_SETTINGS = "app.gps_settings";
+
     SharedPreferences mSettings;
 
     public SettingsStorage(Context c) {
