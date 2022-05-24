@@ -159,7 +159,12 @@ public class ContactsActivity extends AppCompatActivity {
                         }
                     }
                 }
-                contactsAdapter.refresh();
+                ContactsActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        contactsAdapter.refresh();
+                    }
+                });
             }
         });
     }

@@ -136,7 +136,7 @@ public class MmdvmService extends Service {
                     .setContentTitle("Content title")
                     .setTicker("ticker text")
                     .setContentText("content text")
-                    .setSmallIcon(R.mipmap.ic_launcher_foreground)
+                    .setSmallIcon(R.drawable.ic_baseline_local_phone_24)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .setWhen(0)
                     .setOnlyAlertOnce(true)
