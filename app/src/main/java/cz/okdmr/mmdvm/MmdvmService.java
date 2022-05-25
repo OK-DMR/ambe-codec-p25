@@ -83,15 +83,18 @@ public class MmdvmService extends Service {
         }
     };
 
+    private boolean dfl_a9_receiver_registered = false;
     private void registerBroadcasts(boolean setActive) {
-        if (setActive) {
+        if (setActive && !dfl_a9_receiver_registered) {
             IntentFilter filter = new IntentFilter(ACTION_PTT_PRESSED);
             filter.addAction(ACTION_PTT_RELEASED);
             filter.addAction(ACTION_SOS_PRESSED);
             filter.addAction(ACTION_SOS_RELEASED);
             registerReceiver(dfl_a9_receiver, filter);
-        } else {
+            dfl_a9_receiver_registered = true;
+        } else if(dfl_a9_receiver_registered) {
             unregisterReceiver(dfl_a9_receiver);
+            dfl_a9_receiver_registered = false;
         }
     }
 

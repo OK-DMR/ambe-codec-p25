@@ -29,11 +29,11 @@ public class MMDVM {
     }
 
     public static byte[] getMasterPing(int repeater_id) {
-        return ByteBuffer.allocate(11).put("MSTPING".getBytes()).putInt(repeater_id).array();
+        return ByteBuffer.allocate(11).put("MSTPONG".getBytes()).putInt(repeater_id).array();
     }
 
     public static byte[] getRepeaterPong(int repeater_id) {
-        return ByteBuffer.allocate(11).put("RPTPONG".getBytes()).putInt(repeater_id).array();
+        return ByteBuffer.allocate(11).put("RPTPING".getBytes()).putInt(repeater_id).array();
     }
 
     public static byte[] getMasterClosing(int repeater_id) {
@@ -61,13 +61,15 @@ public class MMDVM {
             String longitude_9,
             String height_3,
             String location_20,
-            String description_20,
+            String description_19,
+            String slots_1,
             String url_124,
             String software_id_40,
             String package_id_40
     ) {
         return ByteBuffer.allocate(302)
                 .put("RPTC".getBytes())
+                .putInt(repeater_id)
                 .put(Strings.padEnd(callsign_8, 8, ' ').substring(0, 8).getBytes())
                 .put(Strings.padEnd(rx_frequence_9, 9, ' ').substring(0, 9).getBytes())
                 .put(Strings.padEnd(tx_frequence_9, 9, ' ').substring(0, 9).getBytes())
@@ -77,11 +79,11 @@ public class MMDVM {
                 .put(Strings.padEnd(longitude_9, 9, ' ').substring(0, 9).getBytes())
                 .put(Strings.padEnd(height_3, 3, ' ').substring(0, 3).getBytes())
                 .put(Strings.padEnd(location_20, 20, ' ').substring(0, 20).getBytes())
-                .put(Strings.padEnd(description_20, 20, ' ').substring(0, 20).getBytes())
+                .put(Strings.padEnd(description_19, 19, ' ').substring(0, 19).getBytes())
+                .put(Strings.padEnd(slots_1, 1, '1').substring(0, 1).getBytes())
                 .put(Strings.padEnd(url_124, 124, ' ').substring(0, 124).getBytes())
                 .put(Strings.padEnd(software_id_40, 40, ' ').substring(0, 40).getBytes())
                 .put(Strings.padEnd(package_id_40, 40, ' ').substring(0, 40).getBytes())
-                .putInt(repeater_id)
                 .array();
     }
 
@@ -142,7 +144,6 @@ public class MMDVM {
                 .putInt(stream_id)
                 .put(dmr_data)
                 .array();
-
     }
 
 }
