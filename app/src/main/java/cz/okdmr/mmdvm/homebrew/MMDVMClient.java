@@ -36,6 +36,8 @@ public class MMDVMClient extends Thread {
     private long PING_TIMEOUT_MS = 10000;
     private long LOGIN_TIMEOUT_MS = 5000;
 
+    public native void addSamples(byte[] samples);
+
     @Nullable
     private InetAddress getTargetAddress() {
         if (targetAddress == null) {
@@ -125,11 +127,8 @@ public class MMDVMClient extends Thread {
                 dgram_socket.send(new DatagramPacket(configuration, configuration.length, getTargetAddress(), targetPort));
                 current_status = ConnectionStatus.CONFIGURATION_SENT;
                 Log.d(LOG_TAG, "Configuration sent");
-                Log.d(LOG_TAG, "config: " + BaseEncoding.base16().lowerCase().encode(configuration));
             }
-        }
-
-        if (parsed.commandData() instanceof Mmdvm2020.TypeMasterNotAccept) {
+        } else if (parsed.commandData() instanceof Mmdvm2020.TypeMasterNotAccept) {
 
             if (current_status == ConnectionStatus.CONFIGURATION_SENT) {
                 Log.e(LOG_TAG, "Configuration was not accepted by master");
@@ -142,6 +141,23 @@ public class MMDVMClient extends Thread {
                 current_status = ConnectionStatus.NOT_CONNECTED;
             }
 
+        } else if (parsed.commandData() instanceof Mmdvm2020.TypeDmrData) {
+            Mmdvm2020.TypeDmrData dmrd = (Mmdvm2020.TypeDmrData) parsed.commandData();
+            Log.d(LOG_TAG, String.format(
+                    "DMRD received [frame: %d data: %d] [FROM %d TO %d] [SEQ %d] [TS%d] [CALL %s]",
+                    dmrd.frameType().id(),
+                    dmrd.dataType(),
+                    dmrd.sourceId(),
+                    dmrd.targetId(),
+                    dmrd.sequenceNo(),
+                    dmrd.slotNo().id() + 1,
+                    dmrd.callType() == Mmdvm2020.CallTypes.GROUP_CALL ? "GROUP" : "PRIVATE"
+                    ));
+            if (dmrd.frameType() == Mmdvm2020.FrameTypes.VOICE_SYNC) {
+                Log.d(LOG_TAG, "Voice sync: " + BaseEncoding.base16().lowerCase().encode(dmrd.dmrData()));
+            } else if (dmrd.frameType() == Mmdvm2020.FrameTypes.VOICE_DATA) {
+                Log.d(LOG_TAG, "Voice data: " + BaseEncoding.base16().lowerCase().encode(dmrd.dmrData()));
+            }
         }
     }
 
