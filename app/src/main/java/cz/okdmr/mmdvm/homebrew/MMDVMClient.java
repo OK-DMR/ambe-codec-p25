@@ -89,7 +89,9 @@ public class MMDVMClient extends Thread {
             Log.e(LOG_TAG, "datagramReceived", e);
             return;
         }
-        Log.d(LOG_TAG, "incoming " + parsed.commandPrefix() + " data: " + (parsed.commandData() == null ? "NONE" : parsed.commandData().getClass().getName()));
+        if (!(parsed.commandData() instanceof Mmdvm2020.TypeMasterPong)) {
+            Log.d(LOG_TAG, "incoming " + parsed.commandPrefix() + " data: " + (parsed.commandData() == null ? "NONE" : parsed.commandData().getClass().getName()));
+        }
 
         if (parsed.commandData() == null) {
             Log.e(LOG_TAG, "datagramReceived null commandData");
@@ -190,7 +192,7 @@ public class MMDVMClient extends Thread {
         try {
             // check timeout
             if ((System.currentTimeMillis() - lastPingRequestSent) > PING_TIMEOUT_MS) {
-                Log.d(LOG_TAG, "sendPingRequest proceed");
+                //Log.d(LOG_TAG, "sendPingRequest proceed");
                 lastPingRequestSent = System.currentTimeMillis();
                 byte[] message_out = MMDVM.getRepeaterPong(repeaterId);
                 DatagramPacket packet = new DatagramPacket(message_out, message_out.length, getTargetAddress(), targetPort);
