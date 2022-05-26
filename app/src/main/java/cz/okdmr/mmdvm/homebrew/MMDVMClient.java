@@ -24,7 +24,7 @@ public class MMDVMClient extends Thread {
     boolean running = false;
     DatagramSocket dgram_socket;
 
-    String address = "dmrs3.ok-dmr.cz";
+    String address = "dmrs1.ok-dmr.cz";
     InetAddress targetAddress;
     int targetPort = 62031;
 
