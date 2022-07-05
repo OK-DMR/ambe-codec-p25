@@ -22,4 +22,10 @@
 
     </Button>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PLAY TEST AMBE"
+        android:id="@+id/play_test_ambe"/>
+
 </LinearLayout>

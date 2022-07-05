@@ -18,6 +18,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static String LOG_TAG = "MmdvmMain";
 
+    public native void getNativeString();
+
+    static {
+        System.loadLibrary("mmdvm");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +38,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.service_stop).setOnClickListener(v -> {
             startService((new Intent(this, MmdvmService.class)).setAction(MmdvmService.ACTION_STOP_MMDVM_SERVICE));
         });
-        //startService(new Intent(this, MmdvmService.class));
+        findViewById(R.id.play_test_ambe).setOnClickListener(v -> {
+            //getNativeString();
+            sendBroadcast(new Intent(MmdvmService.ACTION_PLAY_TEST_SOUND));
+        });
+        startService(new Intent(this, MmdvmService.class));
         //checkAccessibilityPermission();
         checkPermissions();
     }

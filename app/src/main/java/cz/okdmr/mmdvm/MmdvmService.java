@@ -40,6 +40,8 @@ public class MmdvmService extends Service {
     public static String ACTION_PTT_PRESSED = "com.dfl.a9.camdown";
     public static String ACTION_PTT_RELEASED = "com.dfl.a9.camup";
 
+    public static String ACTION_PLAY_TEST_SOUND = "cz.okdmr.play_test_sound";
+
     private Notification mNotification;
     private NotificationManager mNotificationManager;
     private PendingIntent mStartMainActivityIntent;
@@ -83,6 +85,15 @@ public class MmdvmService extends Service {
         }
     };
 
+    private final BroadcastListener mmdvm_receiver = new BroadcastListener(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (mMmdvmClient != null) {
+                mMmdvmClient.playTestAmbe();
+            }
+        }
+    };
+
     private boolean dfl_a9_receiver_registered = false;
     private void registerBroadcasts(boolean setActive) {
         if (setActive && !dfl_a9_receiver_registered) {
@@ -91,9 +102,14 @@ public class MmdvmService extends Service {
             filter.addAction(ACTION_SOS_PRESSED);
             filter.addAction(ACTION_SOS_RELEASED);
             registerReceiver(dfl_a9_receiver, filter);
+
+            IntentFilter mmdvm_filter = new IntentFilter(ACTION_PLAY_TEST_SOUND);
+            registerReceiver(mmdvm_receiver, mmdvm_filter);
+
             dfl_a9_receiver_registered = true;
         } else if(dfl_a9_receiver_registered) {
             unregisterReceiver(dfl_a9_receiver);
+            unregisterReceiver(mmdvm_receiver);
             dfl_a9_receiver_registered = false;
         }
     }
@@ -199,7 +215,7 @@ public class MmdvmService extends Service {
         }
         mMmdvmClient.connect(enable);
         if (enable) {
-            mMmdvmClient.start();
+            //mMmdvmClient.start();
         }
     }
 }

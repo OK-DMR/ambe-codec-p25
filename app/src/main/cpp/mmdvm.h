@@ -45,19 +45,27 @@ public:
     }
 
     int32_t prepareAudio() {
+        //if (audioPrepared) {
+        //    return (int32_t) oboe::Result::OK;
+        //}
+
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::startAudio",
                             "prepareAudio");
         std::lock_guard<std::mutex> lock(mStreamLock);
         oboe::AudioStreamBuilder builder;
-        oboe::Result result = builder.setUsage(Usage::VoiceCommunication)
+        oboe::Result result = builder.setUsage(Usage::Game)
                 ->setDirection(oboe::Direction::Output)
-                ->setSharingMode(oboe::SharingMode::Exclusive)
+                ->setSharingMode(oboe::SharingMode::Shared)
                 ->setFormat(oboe::AudioFormat::I16)
                 ->setChannelCount(oboe::ChannelCount::Mono)
                 ->setSampleRate(8000)
                 ->setContentType(ContentType::Speech)
                 ->setDataCallback(this)
                 ->openStream(mStream);
+
+        if (result == oboe::Result::OK) {
+           // audioPrepared = true;
+        }
 
         return (int32_t) result;
     };
@@ -72,19 +80,20 @@ public:
     void addSamples(short const samples[], uint32_t const amount) {
         std::lock_guard<std::mutex> lock(mBufferLock);
         for (int i = 0; i < amount; i++) {
-            mBuffer.push(samples[i]);
+            mBuffer.push(samples[i] & 0xFFFF);
         }
     }
 
     void addAmbeSamples(unsigned char ambeData[9]) {
         int16_t *pcm = new int16_t[160];
         //__android_log_print(ANDROID_LOG_WARN, "OboePlayer::addAmbeSamples",
-        //                    "%d%d%d%d%d%d%d%d%d", ambeData[0], ambeData[1], ambeData[2], ambeData[3], ambeData[4], ambeData[5], ambeData[6], ambeData[7], ambeData[8]);
+        //                    "%d:%d:%d:%d:%d:%d:%d:%d:%d", ambeData[0], ambeData[1], ambeData[2], ambeData[3], ambeData[4], ambeData[5], ambeData[6], ambeData[7], ambeData[8]);
         starVocoder->decode_2450x1150(pcm, ambeData);
         this->addSamples(pcm, 160);
     }
 
 private:
+    //bool audioPrepared = false;
     std::mutex mStreamLock;
     std::mutex mBufferLock;
     std::shared_ptr<oboe::AudioStream> mStream;
