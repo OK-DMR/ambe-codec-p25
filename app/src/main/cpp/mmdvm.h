@@ -45,15 +45,15 @@ public:
     }
 
     int32_t prepareAudio() {
-        //if (audioPrepared) {
-        //    return (int32_t) oboe::Result::OK;
-        //}
+        if (audioPrepared && mStream->getState()) {
+            return (int32_t) oboe::Result::OK;
+        }
 
         __android_log_print(ANDROID_LOG_WARN, "OboePlayer::startAudio",
                             "prepareAudio");
         std::lock_guard<std::mutex> lock(mStreamLock);
         oboe::AudioStreamBuilder builder;
-        oboe::Result result = builder.setUsage(Usage::Game)
+        oboe::Result result = builder.setUsage(Usage::Media)
                 ->setDirection(oboe::Direction::Output)
                 ->setSharingMode(oboe::SharingMode::Shared)
                 ->setFormat(oboe::AudioFormat::I16)
@@ -63,9 +63,7 @@ public:
                 ->setDataCallback(this)
                 ->openStream(mStream);
 
-        if (result == oboe::Result::OK) {
-           // audioPrepared = true;
-        }
+        audioPrepared = result == oboe::Result::OK;
 
         return (int32_t) result;
     };
@@ -93,7 +91,7 @@ public:
     }
 
 private:
-    //bool audioPrepared = false;
+    bool audioPrepared = false;
     std::mutex mStreamLock;
     std::mutex mBufferLock;
     std::shared_ptr<oboe::AudioStream> mStream;
